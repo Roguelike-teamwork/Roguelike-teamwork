@@ -82,14 +82,7 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 	curShield = shield;		
 	curManaPoints = manaPoints;
 			
-	for (int i = 0; i < INIT_EQUIP_NUMBER; ++i)    //++i???不甚理解可能存在bug
-	{
-		equips[i] = nullptr;
-
-	}
 	return true;
-
-
 }
 
 bool Fighter::isFullEquipments()

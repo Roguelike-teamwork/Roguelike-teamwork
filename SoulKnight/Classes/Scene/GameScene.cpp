@@ -3,7 +3,6 @@
 #include "Controller/MoveCtrl.h"
 #include "cocos2d.h"
 #include "Const/MapInfo.h"
-//#include "MovingActor/Knight.h"
 #include"MovingActor/TestMan.h"
 
 USING_NS_CC;
@@ -110,26 +109,31 @@ void GameScene::initMapLayer()
 
 	addChild(_map, 0, 10000);//TAG_MAP
 }
-
-
 CCPoint GameScene::tileCoordForPosition(CCPoint position)
 {
 	int x = position.x / _map->getTileSize().width;
 	int y = ((_map->getMapSize().height * _map->getTileSize().height) - position.y) / _map->getTileSize().height;
 	return ccp(x, y);
 }
-
-
 //刷新敌人？
 void GameScene::generateEnemies(float delta)
 {
-	
+	if (true) //生成boss的条件
+	{
+		auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");
+		frame->setPosition(Vec2(512, 0));
+		this->addChild(frame);
+
+		auto blood = Sprite::create("ArtDesigning/Word&Others/Comonent/YellowComp.png");
+
+		ProgressTimer* comp = ProgressTimer::create(blood);
+		comp->setType(ProgressTimer::Type::BAR);
+		comp->setPosition(Vec2(0, 512));
+		comp->setMidpoint(Vec2(0, 0.5));
+		comp->setBarChangeRate(Vec2(1, 0));
+		this->addChild(comp);
+	}
 }
-
-
-
-
-
 //初始化主角,目前少角色类（在多角色可选的前提下）
 void GameScene::initFighter()
 {
@@ -158,7 +162,6 @@ void GameScene::initFighter()
 	CCPoint sp_point = fighter->getPosition();
 	setViewpointCenter(sp_point); //设置视图中心点
 }
-
 void GameScene::initListener()
 {
 	//创建键盘监听器
@@ -169,6 +172,36 @@ void GameScene::initListener()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeyBoard, this);
 }
 
+void GameScene::initComp()
+{
+	auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");
+	frame->setPosition(Vec2(0, 750));
+	this->addChild(frame);
+
+	auto blood = Sprite::create("ArtDesigning/Word&Others/Comonent/RedComp.png");
+
+	ProgressTimer* comp = ProgressTimer::create(blood);
+	comp->setType(ProgressTimer::Type::BAR);
+	comp->setPosition(Vec2(0, 750));
+	comp->setMidpoint(Vec2(0, 0.5));
+	comp->setTag(FRIENDLY);
+	comp->setBarChangeRate(Vec2(1, 0));
+	this->addChild(comp);
+
+}
+
+void GameScene::updateComp()
+{
+	auto myComp = (ProgressTimer*)this->getChildByTag(FRIENDLY);
+	myComp->setPercentage((((float)_myFighter->getCurHitPoints())/_myFighter->getMaxHitpoints())*100);
+
+	if (!enemyBoss.empty())
+	{
+		auto it = enemyBoss.begin();
+		auto myComp = (ProgressTimer*)this->getChildByTag(ENEMY);
+		myComp->setPercentage((((float)(*it)->getCurHitPoints()) / (*it)->getCurHitPoints()) * 100);
+	}
+}
 //加载动画（一个旋涡状）
 void GameScene::loadingAnimation()
 {
@@ -215,7 +248,6 @@ void GameScene::updateFighterPosition()
 	}*/
 }
 
-
 void GameScene::updateFlyingItem()
 {
 	for (auto current = flyingItem.begin(); current != flyingItem.end();)
@@ -224,7 +256,6 @@ void GameScene::updateFlyingItem()
 		current++;
 	}
 }
-
 
 //帧更新
 void GameScene::update(float delta)
@@ -269,7 +300,6 @@ void GameScene::update(float delta)
 	}*/
 }
 
-
 void GameScene::updateEnemiesAttackTarget()
 {
 
@@ -277,14 +307,11 @@ void GameScene::updateEnemiesAttackTarget()
 
 }
 
-
-
 //攻击范围
 void GameScene::CircleDamage(Point point, float radius, float damage)
 {
 
 }
-
 
 bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 {
@@ -296,16 +323,11 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 	keys[keyCode] = true;
 	return true;
 }
-
-
-
 bool GameScene::onReleaseKey(EventKeyboard::KeyCode keyCode, Event* event)
 {
 	//keys[keyCode] = false;
 	return true;
 }
-
-
 bool GameScene::isKeyPressed(EventKeyboard::KeyCode keyCode)
 {
 	if (keys[keyCode])

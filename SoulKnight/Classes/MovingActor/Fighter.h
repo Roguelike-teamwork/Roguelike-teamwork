@@ -6,6 +6,7 @@
 #include "MovingActor/Constant.h"
 #include "MovingActor/Enemy.h"
 #include "MovingActor/Equipment.h"
+#include "MovingActor/Buff.h"
 
 USING_NS_CC;
 
@@ -44,6 +45,8 @@ class Fighter :public MovingActor
 public:
 
 	Vector<Equipment*> myWeapon;
+	
+	Vector<Buff*> myBuff;
 
 	virtual bool isFullEquipments();               //判断是否带满武器
 
@@ -77,12 +80,14 @@ public:
 
 	virtual void hurt(INT32 damage);                    //受伤
 
+	virtual void takeBuff(Buff* buff);
+
+	virtual void removeBuff();
+
 protected:
 
 
 	ValueMap initFighterData;
-
-	Equipment* equips[INIT_EQUIP_NUMBER];  //武器栏初始化
 
 	virtual void die();                  //角色死亡时进行的操作
 
