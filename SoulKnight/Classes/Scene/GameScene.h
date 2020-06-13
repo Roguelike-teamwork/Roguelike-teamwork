@@ -39,12 +39,13 @@ private:
 	void generateEnemies(float delta);
 	void initMapLayer();
 	void initFighter();
+	void initComp();
 	void initListener();
 	//更新角色位置
 	void updateFighterPosition();
 	void setViewpointCenter(CCPoint position);
 	void updateFlyingItem();
-
+	void updateComp();
 	//更新攻击目标
 	void updateEnemiesAttackTarget();
 

@@ -84,6 +84,8 @@ public:
 
 	virtual void removeBuff();
 
+	virtual void initHealthComp();
+
 protected:
 
 
