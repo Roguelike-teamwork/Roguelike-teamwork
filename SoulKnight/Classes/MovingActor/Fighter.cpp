@@ -46,7 +46,7 @@ bool Fighter::init(GameScene* Scene, std::string fighterName)
 bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 {
 	ValueMap value = FileUtils::getInstance()->getValueMapFromFile("FightersData.plist");
-	initFighterData = value.at(Name).asValueMap();
+	//initFighterData = value.at(Name).asValueMap();
 
 	exploreScene = Scene;
 	fighterName = Name;
@@ -62,12 +62,9 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 	skillCDTime = initFighterData["skillCD"].asFloat();
 
 
-	//测试用
-	setTexture(StringUtils::format("ArtDesigning/Sprite/Fighter/KnightDown.png"));
-
 	identityRadius = INIT_ID_RADIUS;
   
-
+	
 	equipNumber = INIT_EQUIP_NUMBER;
 
 	alreadyDead = false;
@@ -127,7 +124,7 @@ bool Fighter::attack()
 											currentWeapon->getAttackNumber(),
 											currentWeapon->getFlySpeed(),
 											this,
-											NULL);
+											attackTarget);
 
 		if (!isMoving)
 			bulletSprite->giveOut(ldirection);
@@ -176,7 +173,7 @@ void Fighter::hurt(INT32 damage)
 }
 
 
-Vec2 Fighter::updateDestination()      //
+Vec2 Fighter::updateDestination()       //
 {
 	isMoving = true;
 	Vec2 current = this->getPosition();
@@ -220,27 +217,26 @@ Vec2 Fighter::updateDestination()      //
 	return current;
 }
 
-void Fighter::fighterMove()
+void Fighter::fighterMove(Vec2 newPosition)
 {
-	this->setPosition(updateDestination());
+	this->setPosition(newPosition);
 }
-
 void Fighter::stand()
 {
 	isMoving = false;
 	switch (fdirection)
 	{
 	case EDirection::UP:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sUp",fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sUp",fighterName)->getCString());
 		break;
 	case EDirection::DOWN:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown", fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sDown", fighterName)->getCString());
 		break;
 	case EDirection::LEFT:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sLeft", fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sLeft", fighterName)->getCString());
 		break;
 	case EDirection::RIGHT:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sRight", fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sRight", fighterName)->getCString());
 		break;
 	}
 	direction = EDirection::NODIR;
@@ -322,4 +318,8 @@ void Fighter::die()
 void Fighter::releaseSkill()
 {
      //继承下至具体英雄写	
+}
+void Fighter::bindSprite(CCSprite* sprite) {
+	this->m_sprite = sprite;
+	this->addChild(m_sprite);
 }
