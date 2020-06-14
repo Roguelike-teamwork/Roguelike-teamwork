@@ -216,8 +216,6 @@ void GameScene::updateFighterPosition()
 		_myFighter->setFDirection(_rocker->getFirstDirection());
 		_myFighter->setLDriection(_rocker->getLastDirection());
 		_myFighter->setDirection(_rocker->getDirection());
-		_myFighter->fighterMove();
-		_myFighter->stand();
 	}
 	auto newPosition = _myFighter->getPosition();
 	//Åö×²¼ì²â

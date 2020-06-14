@@ -3,7 +3,6 @@
 #define __EQUIPMENT_H__
 #include<iostream>
 #include"cocos2d.h"
-//#include"MovingActor/Fighter.h"
 #include"Constant.h"
 
 USING_NS_CC;
@@ -33,7 +32,7 @@ public:
 	//射击动画
 
 	//EQUIPMENT初始化参数比较多，为了不至于把传参与变量弄混，加下划线做区分
-	virtual bool init(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
+	virtual bool init(EAttackMode _equipType, String _weaponName, int _attack,
 		float _attackSpeed, int _attackRadius,int _manaConsume
 	);
 
@@ -41,7 +40,7 @@ public:
 	virtual bool init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname);   //以plist文件直接进行定义
 
 
-	static Equipment* create(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
+	static Equipment* create(EAttackMode _equipType, String _weaponName, int _attack,
 		float _attackSpeed, int _attackRadius, int _manaConsume
 	);
 

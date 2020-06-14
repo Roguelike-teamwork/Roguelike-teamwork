@@ -17,6 +17,7 @@ class Enemy :public MovingActor
 	CC_SYNTHESIZE(MovingActor*, fromFighter, FromFighter);
 	CC_SYNTHESIZE(EDirection, fDirecition, FDirection);
 	CC_SYNTHESIZE(bool,isToMove,IsToMove);
+	
 
 public:
 	static Enemy* create(GameScene* Scene, std::string fighterName);
