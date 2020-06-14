@@ -1,5 +1,5 @@
 #include"EnemyMelee.h"
-#include "GameScene.h"
+#include "Scene/GameScene.h"
 #include"Fighter.h"
 EnemyMelee* EnemyMelee::create(GameScene* Scene, std::string enemyName)
 {
@@ -32,10 +32,10 @@ bool EnemyMelee::initData(GameScene* Scene, std::string enemyName)
 
 	attackSpeed = 1.0f;
 	hitPoints = 50;
-	curHitPoints = hitPoints;    //Êı¾İ¾ßÌå»¯£¬²»¶¯ÓÃplist
+	curHitPoints = hitPoints;    //æ•°æ®å…·ä½“åŒ–ï¼Œä¸åŠ¨ç”¨plist
 
 	damageAbility = 1;
-	moveSpeed = 2;
+	moveSpeed = 100;
 	identityRadius = 400;
 
 	alreadyDead = false;
@@ -52,10 +52,10 @@ bool  EnemyMelee::attack()
 
 	if (attackTarget)
 	{
-		//Èç¹û½üÉíÖ®¹¥»÷¶ÔÏó·¶Î§ÒÔÄÚ£¬Ôò´¥·¢¹¥»÷¶¯»­£¬ÇĞ±ØĞëÒªÔÚÉÏÒ»´Î¹¥»÷µÄÊ±¼ä¼ä¸ôÖ®ºó
+		//å¦‚æœè¿‘èº«ä¹‹æ”»å‡»å¯¹è±¡èŒƒå›´ä»¥å†…ï¼Œåˆ™è§¦å‘æ”»å‡»åŠ¨ç”»ï¼Œåˆ‡å¿…é¡»è¦åœ¨ä¸Šä¸€æ¬¡æ”»å‡»çš„æ—¶é—´é—´éš”ä¹‹å
 		if (nowTime - lastAttackTime > (1.0f / attackSpeed))
 		{
-			if ((Fighter*)attackTarget/*->curHitPoints*/)//Èç¹ûFighter³ÔÉËº¦£¬¸ù¾İÊÇ·ñÓĞ»¤¶ÜÅĞ¶ÏµôÑª.´Ë´¦attackTarget²»ÊÇfighterÀàµÄ£¬ÎÒÏëÇ¿×ªµ«¿ÉÄÜÓĞÎÊÌâ
+			if ((Fighter*)attackTarget/*->curHitPoints*/)//å¦‚æœFighteråƒä¼¤å®³ï¼Œæ ¹æ®æ˜¯å¦æœ‰æŠ¤ç›¾åˆ¤æ–­æ‰è¡€.æ­¤å¤„attackTargetä¸æ˜¯fighterç±»çš„ï¼Œæˆ‘æƒ³å¼ºè½¬ä½†å¯èƒ½æœ‰é—®é¢˜
 			{
 			}
 
@@ -65,3 +65,4 @@ bool  EnemyMelee::attack()
 	return true;
 	
 }
+
