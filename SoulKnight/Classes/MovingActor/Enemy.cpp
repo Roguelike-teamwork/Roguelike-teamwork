@@ -21,8 +21,8 @@ bool Enemy::init(GameScene* Scene, std::string Name)
 {
 	if (!Sprite::init())
 		return false;
-
 	initData(Scene,Name);
+	isMoving = false;
 	return true;
 }
 
@@ -32,6 +32,7 @@ bool Enemy::initData(GameScene* Scene, std::string Name)
 	enemyName = Name;
 	camp = AllCamp::ENEMY;
 	
+	setTexture(CCString::createWithFormat("%s",enemyName)->getCString());
 
 	alreadyDead = false;
 	attackSpeed = 0.f;
@@ -46,7 +47,7 @@ void  Enemy::updateTarget()
 	MovingActor* tempTarget = NULL;
 	Vector<MovingActor*>& allFighter = exploreScene->allFighter;
 
-	//ÏÈ°´ÕÕÖ»ÓÐÒ»ÃûÍæ¼Ò´¦Àí
+	//å…ˆæŒ‰ç…§åªæœ‰ä¸€åçŽ©å®¶å¤„ç†
 	auto temp = allFighter.begin();
 	auto tempRadius = identityRadius;
 
@@ -60,16 +61,13 @@ void  Enemy::updateTarget()
 
 void Enemy::updateDestination()
 {
-	if (!isToMove)
-		return;
-
 	Vec2 tempDes;
 	if (!attackTarget)
 	{
 		float tempX, tempY;
 
-		tempX = random(-200, 200) / moveSpeed;
-		tempY = random(-200, 200) / moveSpeed;
+		tempX = random(-50, 50) ;//å¦‚æžœè¿‡å¤§ï¼Œå°†å‡ºç•Œï¼Œå› ä¸ºç•Œå¤–æ²¡æœ‰ç“¦ç‰‡,ä¸å¯¹å…¶è¿›è¡Œç¢°æ’žæ£€æµ‹ï¼Œç›´æŽ¥æ¡†åœ¨æˆ¿é—´é‡Œ
+		tempY = random(-50, 50) ;
 
 		if (tempY >= 0)
 			fDirecition = EDirection::RIGHT;
@@ -91,9 +89,10 @@ void Enemy::updateDestination()
 
 void Enemy::enemyMove()
 {
-	auto moveTime = destination.getDistance(this->getPosition())/moveSpeed;
-	auto move = MoveTo::create(moveTime, destination);
-		
+	isMoving = true;
+	auto moveTime = destination.getDistance(this->getPosition()) / moveSpeed;
+	auto move = MoveTo::create(moveTime,this->getDestination());
+	this->runAction(move);
 }
 
 bool Enemy::attack()
@@ -103,11 +102,11 @@ bool Enemy::attack()
 	{
 		auto bulletSprite = Bullet::create(CCString::createWithFormat("%sBullet",enemyName)->getCString(), damageAbility, flySpeed, this, attackTarget);
 		
-		//¶Ô·ÉÐÐÎïµÄµ÷Õû
+		//å¯¹é£žè¡Œç‰©çš„è°ƒæ•´
 		bulletSprite->setPosition(this->getPosition());
 		//bulletSprite->setScale();
 		
-		//½«·ÉÐÐÎï·ÅÈë³¡¾°µÄÈÝÆ÷Ö®ÖÐ
+		//å°†é£žè¡Œç‰©æ”¾å…¥åœºæ™¯çš„å®¹å™¨ä¹‹ä¸­
 		exploreScene->getMap()->addChild(bulletSprite);
 		exploreScene->flyingItem.pushBack(bulletSprite);
 		
@@ -121,10 +120,9 @@ void Enemy::die()
 	setVisible(false);
 	alreadyDead = true;
 }
-
 void Enemy::updateAction()
-{	
-	if(attackTarget)
+{
+	if (attackTarget)
 	{
 		if (!attackTarget->getAlreadyDead())
 		{
@@ -140,4 +138,8 @@ void Enemy::updateAction()
 				isToMove = true;
 		}
 	}
+}
+void Enemy::bindSprite(CCSprite* sprite) {
+	this->m_sprite = sprite;
+	this->addChild(m_sprite);
 }
