@@ -20,6 +20,7 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(EDirection, ldirection, LDriection);//
 	CC_SYNTHESIZE(bool, isMoving, IsMoving);
 
+
 	CC_SYNTHESIZE(int, shield, Shield);                //护甲值上限
 	CC_SYNTHESIZE(int, curShield, CurShield);		   //当前护甲值
 	CC_SYNTHESIZE(float, acRcoverSpeed, ACRcoverSpeed); //护甲刷新时间
@@ -39,9 +40,9 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(float,lastReleaseTime,LastReleaseTime);
 	CC_SYNTHESIZE(float, lastSkillTime, LastSkillTime);      //技能持续时间
 	CC_SYNTHESIZE(float, skillCDTime, SkillCDTime);			//技能冷却时间
-
+	CC_SYNTHESIZE(EBuffType, state, State);
 	
-
+	CCSprite* m_sprite;
 public:
 
 	Vector<Equipment*> myWeapon;
@@ -62,7 +63,7 @@ public:
 
 	virtual Vec2 updateDestination();
 
-	virtual void fighterMove();               //发起移动
+	virtual void fighterMove(Vec2 newPosition);               //发起移动
 
 	virtual void stand();                     //停止移动后英雄的面向
 
@@ -85,6 +86,8 @@ public:
 	virtual void removeBuff();
 
 	virtual void initHealthComp();
+
+	virtual void bindSprite(CCSprite* sprite);
 
 protected:
 

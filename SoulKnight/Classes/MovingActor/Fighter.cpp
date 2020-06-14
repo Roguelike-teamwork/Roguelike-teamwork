@@ -221,6 +221,7 @@ void Fighter::fighterMove(Vec2 newPosition)
 {
 	this->setPosition(newPosition);
 }
+
 void Fighter::stand()
 {
 	isMoving = false;
@@ -319,7 +320,47 @@ void Fighter::releaseSkill()
 {
      //继承下至具体英雄写	
 }
+
 void Fighter::bindSprite(CCSprite* sprite) {
+	
 	this->m_sprite = sprite;
 	this->addChild(m_sprite);
+}
+
+void Fighter::takeBuff(Buff* buff)
+{
+	this->curHitPoints += buff->getBuffHp();
+	this->curManaPoints += buff->getBuffMp();
+	this->moveSpeed += buff->getBuffMoveSpeed();
+
+	if (state == EBuffType::NORMAL)
+		state = buff->getBuffType();
+
+	buff->setBeginTime(GetCurrentTime());
+
+	this->myBuff.pushBack(buff);
+}
+
+void Fighter::removeBuff()
+{
+	auto nowTime = GetCurrentTime();
+
+	for (auto it = myBuff.begin(); it != myBuff.end();)
+	{
+		if (nowTime - (*it)->getBeginTime() > (*it)->getDuration())
+		{
+			
+				this->curHitPoints -= (*it)->getBuffHp();
+				this->curManaPoints -= (*it)->getBuffMp();
+				this->moveSpeed -= (*it)->getBuffMoveSpeed();
+
+				if (state == (*it)->getBuffType())
+					state = NORMAL;
+				it = myBuff.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }

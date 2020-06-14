@@ -65,3 +65,25 @@ bool Goblin::loadAnimation()
 
 	return true;
 }
+
+
+bool Goblin::attack()
+{
+
+	if (attackTarget)
+	{
+		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/GoblinBullet.png", damageAbility, flySpeed, this, attackTarget);
+
+		//对飞行物的调整
+		bulletSprite->setPosition(this->getPosition());
+		//bulletSprite->setScale();
+		auto fire = Buff::create(EBuffType::POISON, 0, 0, 0, 4.0f);
+		bulletSprite->setcarryBuff(fire);
+		//将飞行物放入场景的容器之中
+		exploreScene->getMap()->addChild(bulletSprite);
+		exploreScene->flyingItem.pushBack(bulletSprite);
+
+		return true;
+	}
+	return true;
+}

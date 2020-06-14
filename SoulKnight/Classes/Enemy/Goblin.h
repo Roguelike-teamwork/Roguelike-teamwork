@@ -16,6 +16,7 @@ public:
 	static Goblin* create(GameScene* Scene, std::string fighterName);
 	bool init(GameScene* Scene, std::string fighterName);
 	bool initData(GameScene* Scene, std::string fighterName);
+	bool attack();
 	bool loadAnimation();
 };
 

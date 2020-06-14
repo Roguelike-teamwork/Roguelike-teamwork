@@ -171,7 +171,6 @@ void GameScene::initListener()
 	listenerKeyBoard->onKeyReleased = CC_CALLBACK_2(GameScene::onReleaseKey, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeyBoard, this);
 }
-
 void GameScene::initComp()
 {
 	auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");

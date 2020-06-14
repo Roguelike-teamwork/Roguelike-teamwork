@@ -60,6 +60,9 @@ void  Enemy::updateTarget()
 
 void Enemy::updateDestination()
 {
+	if (!isToMove)
+		return;
+
 	Vec2 tempDes;
 	if (!attackTarget)
 	{
@@ -88,8 +91,9 @@ void Enemy::updateDestination()
 
 void Enemy::enemyMove()
 {
-	updateDestination();
-	setPosition(destination);
+	auto moveTime = destination.getDistance(this->getPosition())/moveSpeed;
+	auto move = MoveTo::create(moveTime, destination);
+		
 }
 
 bool Enemy::attack()
@@ -116,4 +120,24 @@ void Enemy::die()
 {
 	setVisible(false);
 	alreadyDead = true;
+}
+
+void Enemy::updateAction()
+{	
+	if(attackTarget)
+	{
+		if (!attackTarget->getAlreadyDead())
+		{
+			auto distance = attackTarget->getPosition().getDistance(this->getPosition());
+
+			if (distance < attackRadius)
+			{
+				attack();
+			}
+			if (distance < attackRadius - 100)
+				isToMove = false;
+			else
+				isToMove = true;
+		}
+	}
 }

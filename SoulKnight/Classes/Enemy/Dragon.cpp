@@ -37,10 +37,15 @@ bool Dragon::initData(GameScene* Scene, std::string Name)
 
 	alreadyDead = false;
 	attackSpeed = 0.f;
+	level = EnemyLevel::BOSS;
 
 	curHitPoints = hitPoints;
 	attackRadius = 500;
-	level = SOLDIER;
+
+	isReleaseSkill_1 = false;
+	isReleaseSkill_2 = false;
+	isReleaseSkill_3 = false;
+	lastSkill = NOTHING;
 
 
 	this->runAction(normal);
@@ -72,6 +77,10 @@ void Dragon::chaosBullets()
 			auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet", enemyName)->getCString(), 2, flySpeed, this, NULL);
 			//bulletSprite->setRotation(360 - angle);
 			bulletSprite->setAngle(angle);
+
+			auto fire = Buff::create(BURN,0,0,0,2.0f);
+			bulletSprite->setcarryBuff(fire);
+
 			exploreScene->getMap()->addChild(bulletSprite);
 			exploreScene->flyingItem.pushBack(bulletSprite);
 }
@@ -84,6 +93,8 @@ void Dragon::roundBullets()
 		auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet", enemyName)->getCString(), 2, flySpeed, this, NULL);
 		//bulletSprite->setRotation(360 - angle);  龙的子弹是圆的好像不需要这一步		
 		bulletSprite->setAngle(angle);
+		auto fire = Buff::create(BURN, 0, 0, 0, 2.0f);
+		bulletSprite->setcarryBuff(fire);
 		exploreScene->getMap()->addChild(bulletSprite);
 		exploreScene->flyingItem.pushBack(bulletSprite);
 	}
@@ -103,3 +114,76 @@ void Dragon::groundFlame()
 
 }
 
+void Dragon::updateState()
+{
+	auto nowTime = GetCurrentTime();
+
+	if (!isReleaseSkill_1 && !isReleaseSkill_2 && !isReleaseSkill_3)
+	{
+		updateAction();
+		if (lastSkill == NOTHING || (lastSkill == THREE && nowTime - endTime > 3.0f))
+		{
+			isReleaseSkill_1 = true;
+			startTime = GetCurrentTime();
+		}
+		else if (lastSkill == ONE && nowTime - endTime > 3.0f)
+		{
+			isReleaseSkill_2 = true;
+			startTime = GetCurrentTime();
+		}
+		else if (lastSkill == TWO && nowTime - endTime > 3.0f)
+		{
+			isReleaseSkill_3 = true;
+			startTime = GetCurrentTime();
+		}
+		eachTime = GetCurrentTime();
+	}
+
+	if (isReleaseSkill_1)
+	{
+		if (nowTime - eachTime > 0.02f)
+		{
+			chaosBullets();
+			eachTime = GetCurrentTime();
+		}
+
+		if (nowTime - startTime >= 6.0f)
+		{
+			isReleaseSkill_1 = false;
+			lastSkill = ONE;
+			endTime = GetCurrentTime();
+		}
+	}
+
+	if (isReleaseSkill_2)
+	{
+		if (nowTime - eachTime > 0.5f)
+		{
+			roundBullets();
+			eachTime = GetCurrentTime();
+		}
+
+		if (nowTime - startTime >= 6.0f)
+		{
+			isReleaseSkill_2 = false;
+			lastSkill = TWO;
+			endTime = GetCurrentTime();
+		}
+	}
+
+	if (isReleaseSkill_3)
+	{
+		if (nowTime - eachTime > 2.0f)
+		{
+			groundFlame();
+			eachTime = GetCurrentTime();
+		}
+
+		if (nowTime - startTime >= 6.0f)
+		{
+			isReleaseSkill_3 = false;
+			lastSkill = THREE;
+			endTime = GetCurrentTime();
+		}
+	}
+}
