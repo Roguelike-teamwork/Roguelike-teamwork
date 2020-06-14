@@ -2,8 +2,9 @@
 #include "SimpleAudioEngine.h"
 #include "Controller/MoveCtrl.h"
 #include "cocos2d.h"
-#include "Const/MapInfo.h"
-#include"MovingActor/TestMan.h"
+//#include "Const/MapInfo.h"
+#include"MovingActor/Knight.h"
+#include"MovingActor/EnemyMelee.h"
 
 USING_NS_CC;
 
@@ -27,7 +28,7 @@ bool GameScene::init()
 		return false;
 
 	}
-
+	_gameBegin = true;
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 	loadingAnimation();
@@ -37,62 +38,35 @@ bool GameScene::init()
 	initListener();
 	scheduleUpdate();
 
-	/*auto rocker = MoveController::createMoveController();
+	auto rocker = MoveController::createMoveController();
 	this->addChild(rocker);
-	_rocker = rocker;*/
+	_rocker = rocker;
 
-
-
-	
-
-	/*µÐÈËÉú³É
-	for (int i = 0; i < 4; i++)
-	{
-		auto soldier = Soldier::create(EAttackMode::REMOTE, ECamp::BLUE, ERoad::MIDWAY, this);
-		_map->addChild(soldier);
-		soldier->setPosition(200, 200 + rand() % 100 * 10);
-		soldier->setScale(0.3);
-		_soldiers.pushBack(soldier);
-	}*/
-
-
+	generateEnemies(1);
 
 
 	return true;
 }
+
 // https://blog.csdn.net/oyangyufu/article/details/26468973
-void GameScene::setViewpointCenter(CCPoint position)
+void GameScene::setViewpointCenter(Vec2 position)
 {
-	CCSize winSize = CCDirector::sharedDirector()->getWinSize();  
-	float x = MAX(position.x, winSize.width / 2);
-	float y = MAX(position.y, winSize.height / 2);  
-	x = MIN(x, (_map->getMapSize().width * _map->getTileSize().width) - winSize.width / 2);
-	y = MIN(y, (_map->getMapSize().height * _map->getTileSize().height) - winSize.height / 2); 	
-	CCPoint acturalPosition = ccp(x, y); 
-	CCPoint centerView = ccp(winSize.width / 2, winSize.height / 2);  
-	CCPoint viewPoint = ccpSub(centerView, acturalPosition);
-	this->setPosition(viewPoint);
+	auto visibleSize = Director::getInstance()->getVisibleSize();//æœ‰ç‚¹é—®é¢˜ï¼šä¸€è¿›åŽ»çš„æ—¶å€™æ²¡æœ‰è®¾ç½®å¥½ä½ç½®
+	float x = MAX(position.x, visibleSize.width / 2);
+	float y = MAX(position.y, visibleSize.height / 2);
+	x = MIN(x, (_map->getMapSize().width * _map->getTileSize().width) - visibleSize.width / 2);
+	y = MIN(y, (_map->getMapSize().height * _map->getTileSize().height) - visibleSize.height / 2);
+	Vec2 pointA = Vec2(visibleSize.width / 2, visibleSize.height / 2);//å±å¹•ä¸­å¿ƒç‚¹
+	Vec2 pointB = Vec2(x, y);//ä½¿ç²¾çµå¤„äºŽå±å¹•ä¸­å¿ƒï¼Œç§»åŠ¨åœ°å›¾ç›®æ ‡ä½ç½®ï¼›
+	log("ç›®æ ‡ä½ç½®(%f,%f)", pointB.x, pointB.y);
+
+	//åœ°å›¾ç§»åŠ¨åç§»é‡
+	Vec2 offset = pointA - pointB;
+	offset.y += 300;
+	log("offset(%f,%f)", offset.x, offset.y);
+	this->setPosition(offset);
 }
 
-void GameScene::setSpritePoint(CCPoint position)
-{
-	CCPoint tilecoord = this->tileCoordForPosition(position);//½«×ø±ê×ª»»³Étile×ø±ê
-    CCTMXLayer* layer = _map->layerNamed("collision"); //»ñÈ¡µØÍ¼²ã
-	int tilegid = layer->tileGIDAt(tilecoord);//»ñÈ¡Í¼ËØGIDÖµ
-	CCLOG("tilegid: %d", tilegid);
-	if (tilegid)
-	{
-		CCDictionary* properties = _map->propertiesForGID(tilegid);//¸ù¾ÝGIDÖµ»ñÈ¡Í¼ËØÊôÐÔ¼üÖµ¼¯ºÏ
-		if (properties)
-		{
-			const CCString* str = properties->valueForKey("ShiTou");//¼üÖµÃû³Æ
-			if (str && str->compare("true") == 0) 	 //¼üÖµ
-			return;
-		}
-	}
-	fighter->setPosition(position);
-
-}
 void GameScene::initMapLayer()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -100,41 +74,48 @@ void GameScene::initMapLayer()
 
 	_map = CCTMXTiledMap::create("ArtDesigning/SceneAndMap/GameMap/GameMap1/GameMap1.tmx");
 	auto size = _map->getBoundingBox().size;
-	_map->setAnchorPoint(Vec2(0.5, 0.5));
-	_map->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-	_map->setScale(0.5);
-
-	auto collisionLayer = _map->getLayer("collision");
-	collisionLayer->setVisible(false);
-
+	_map->setAnchorPoint(Vec2(0,0));
+	_map->setPosition(Vec2(-200, -300));
+	int i = origin.x;
+	_collidable = _map->getLayer("collision");
+	_collidable->setVisible(false);
+	_collidable2 = _map->getLayer("collision2");
+	_collidable2->setVisible(false);
 	addChild(_map, 0, 10000);//TAG_MAP
 }
-CCPoint GameScene::tileCoordForPosition(CCPoint position)
+
+CCPoint GameScene::tileCoordForPosition(CCPoint pos)
+
 {
-	int x = position.x / _map->getTileSize().width;
-	int y = ((_map->getMapSize().height * _map->getTileSize().height) - position.y) / _map->getTileSize().height;
+	CCSize mapTiledNum = _map->getMapSize();
+	CCSize tiledSize = _map->getTileSize();
+	int x = pos.x / tiledSize.width;//è½¬æ¢ä¸ºç“¦å—çš„ä¸ªæ•°æ¨ªåæ ‡ 
+	int y = (mapTiledNum.height* tiledSize.height - pos.y) / tiledSize.height;//è½¬æ¢ä¸ºç“¦å—çš„ä¸ªæ•°çºµåæ ‡
 	return ccp(x, y);
 }
-//Ë¢ÐÂµÐÈË£¿
+
+
+//ç”Ÿæˆæ•Œäºº
 void GameScene::generateEnemies(float delta)
 {
-	if (true) //Éú³ÉbossµÄÌõ¼þ
-	{
-		auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");
-		frame->setPosition(Vec2(512, 0));
-		this->addChild(frame);
+	CCSprite* enemySprite = CCSprite::create("ArtDesigning/Sprite/enemy/pig/pig1.png");
+	
+	Enemy * enemyMelee_1 = EnemyMelee::create(this, "Ranger");
+	enemyMelee_1->bindSprite(enemySprite);
 
-		auto blood = Sprite::create("ArtDesigning/Word&Others/Comonent/YellowComp.png");
-
-		ProgressTimer* comp = ProgressTimer::create(blood);
-		comp->setType(ProgressTimer::Type::BAR);
-		comp->setPosition(Vec2(0, 512));
-		comp->setMidpoint(Vec2(0, 0.5));
-		comp->setBarChangeRate(Vec2(1, 0));
-		this->addChild(comp);
-	}
+	//åŠ è½½å¯¹è±¡å±‚
+	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
+	//åŠ è½½çŽ©å®¶åæ ‡å¯¹è±¡
+	ValueMap  playerPointDic = objGroup->objectNamed("SpawnPoint");
+	float playerX = playerPointDic.at("x").asFloat();
+	float playerY = playerPointDic.at("y").asFloat();
+	CCLOG("sprite postion x: %f, %f", playerX, playerY);
+	enemyMelee_1->setPosition(ccp(playerX, playerY));
+	_map->addChild(enemyMelee_1, 1);
+	_enemies.pushBack(enemyMelee_1);
 }
-//³õÊ¼»¯Ö÷½Ç,Ä¿Ç°ÉÙ½ÇÉ«Àà£¨ÔÚ¶à½ÇÉ«¿ÉÑ¡µÄÇ°ÌáÏÂ£©
+
+//åˆå§‹åŒ–ä¸»è§’,ç›®å‰å°‘è§’è‰²ç±»ï¼ˆåœ¨å¤šè§’è‰²å¯é€‰çš„å‰æä¸‹ï¼‰
 void GameScene::initFighter()
 {
 
@@ -142,14 +123,15 @@ void GameScene::initFighter()
 	
 	//_myHero->setTag(TAG_MYHERO);
 	
-	//Íæ¼ÒÉú³É
-	//addFighter Ô´Âë https://blog.csdn.net/u010778159/article/details/43956151?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
-	CCSprite* playerSprite = CCSprite::create("ArtDesigning/Sprite/Fighter/KnightDown.png");
-	fighter = Testman::create(this, "Ranger");
-	//fighter->bindSprite(playerSprite);
-	//¼ÓÔØ¶ÔÏó²ã
+	//çŽ©å®¶ç”Ÿæˆ
+	//addFighter æºç  https://blog.csdn.net/u010778159/article/details/43956151?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
+	CCSprite* playerSprite = CCSprite::create("ArtDesigning/Sprite/Fighter/downDir.png");
+	fighter = Knight::create(this, "Ranger");
+	fighter->bindSprite(playerSprite);
+
+	//åŠ è½½å¯¹è±¡å±‚
 	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
-	//¼ÓÔØÍæ¼Ò×ø±ê¶ÔÏó
+	//åŠ è½½çŽ©å®¶åæ ‡å¯¹è±¡
 	ValueMap  playerPointDic = objGroup->objectNamed("SpawnPoint");
 	float playerX = playerPointDic.at("x").asFloat();
 	float playerY = playerPointDic.at("y").asFloat();
@@ -157,16 +139,14 @@ void GameScene::initFighter()
 	fighter->setPosition(ccp(playerX, playerY));
 	_map->addChild(fighter, 1);
 	_myFighter = fighter;
-
-	updateFighterPosition();
-	CCPoint sp_point = fighter->getPosition();
-	setViewpointCenter(sp_point); //ÉèÖÃÊÓÍ¼ÖÐÐÄµã
+	setViewpointCenter(fighter->getPosition());
 }
+
 void GameScene::initListener()
 {
-	//´´½¨¼üÅÌ¼àÌýÆ÷
+	//åˆ›å»ºé”®ç›˜ç›‘å¬å™¨
 	listenerKeyBoard = EventListenerKeyboard::create();
-	//°ó¶¨¼àÌýÊÂ¼þ
+	//ç»‘å®šç›‘å¬äº‹ä»¶
 	listenerKeyBoard->onKeyPressed = CC_CALLBACK_2(GameScene::onPressKey, this);
 	listenerKeyBoard->onKeyReleased = CC_CALLBACK_2(GameScene::onReleaseKey, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerKeyBoard, this);
@@ -176,9 +156,7 @@ void GameScene::initComp()
 	auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");
 	frame->setPosition(Vec2(0, 750));
 	this->addChild(frame);
-
 	auto blood = Sprite::create("ArtDesigning/Word&Others/Comonent/RedComp.png");
-
 	ProgressTimer* comp = ProgressTimer::create(blood);
 	comp->setType(ProgressTimer::Type::BAR);
 	comp->setPosition(Vec2(0, 750));
@@ -186,14 +164,11 @@ void GameScene::initComp()
 	comp->setTag(FRIENDLY);
 	comp->setBarChangeRate(Vec2(1, 0));
 	this->addChild(comp);
-
 }
-
 void GameScene::updateComp()
 {
 	auto myComp = (ProgressTimer*)this->getChildByTag(FRIENDLY);
-	myComp->setPercentage((((float)_myFighter->getCurHitPoints())/_myFighter->getMaxHitpoints())*100);
-
+	myComp->setPercentage((((float)_myFighter->getCurHitPoints()) / _myFighter->getMaxHitpoints()) * 100);
 	if (!enemyBoss.empty())
 	{
 		auto it = enemyBoss.begin();
@@ -201,13 +176,13 @@ void GameScene::updateComp()
 		myComp->setPercentage((((float)(*it)->getCurHitPoints()) / (*it)->getCurHitPoints()) * 100);
 	}
 }
-//¼ÓÔØ¶¯»­£¨Ò»¸öÐýÎÐ×´£©
+//åŠ è½½åŠ¨ç”»ï¼ˆä¸€ä¸ªæ—‹æ¶¡çŠ¶ï¼‰
 void GameScene::loadingAnimation()
 {
-	
+
 }
 
-//¸üÐÂÖ÷½ÇÎ»ÖÃ
+//æ›´æ–°ä¸»è§’ä½ç½®
 void GameScene::updateFighterPosition()
 {
 	auto nowTime = GetCurrentTime() / 1000.f;
@@ -215,36 +190,69 @@ void GameScene::updateFighterPosition()
 	{
 		_myFighter->setFDirection(_rocker->getFirstDirection());
 		_myFighter->setLDriection(_rocker->getLastDirection());
-		_myFighter->setDirection(_rocker->getDirection());
-		_myFighter->fighterMove();
-		_myFighter->stand();
+		_myFighter->setDirection(_rocker->getDirection());	
 	}
-	auto newPosition = _myFighter->getPosition();
-	//Åö×²¼ì²â
-	/*if (_mapInformation.checkCollision(newPosition))
+	auto newPosition = _myFighter->updateDestination();
+	CCPoint tiledpos = tileCoordForPosition(ccp(newPosition.x, newPosition.y));
+	CCLOG("tiled x = %f,y = %f", tiledpos.x, tiledpos.y);
+	//ç¢°æ’žæ£€æµ‹
+	int tileGid = _collidable->tileGIDAt(tiledpos);
+	if (tileGid > 0) 
 	{
-		_myFighter->fighterMove();
-		if (nowTime - _myFighter->getLastAttackTime() > _myFighter->getMinAttackInterval() && _myFighter->getVertigoLastTo() < nowTime)
+		Value prop = _map->getPropertiesForGID(tileGid);
+		ValueMap propValueMap = prop.asValueMap();
+
+		std::string collision = propValueMap["collidable"].asString();
+
+		if (collision == "true")
 		{
-			_map->setPosition(_map->getPosition() - positionDelta);
+			return;
 		}
 	}
-		else
-		{
-			_command.isHeroMove = true;
-		}
-	}
-	else
+	setViewpointCenter(newPosition);
+	_myFighter->fighterMove(newPosition);
+	_myFighter->stand();
+}
+
+void GameScene::updateEnemyPosition()
+{
+	auto nowTime = GetCurrentTime() / 1000.f;
+	for (auto& i : _enemies)
 	{
-		if (_gameMode == 0)
+		if (!i->getAlreadyDead()&&i->getIsMoving()==false)
 		{
-			_myHero->stopMove();
+			i->updateDestination();
+    		auto newPosition = i->getDestination();
+			if( !(newPosition.x >= 32 * 18 && newPosition.x <= 31 * 32 && newPosition.y >= 17 * 32 && newPosition.y <= 32 * 32))//æ³¨æ„ç“¦ç‰‡åœ°å›¾çš„yæ–¹å‘ä¸Žå±å¹•ç›¸å
+			{
+				return;
+			}
+			CCPoint tiledpos = tileCoordForPosition(ccp(newPosition.x, newPosition.y));
+			CCLOG("tiled x = %f,y = %f", tiledpos.x, tiledpos.y);
+			//ç¢°æ’žæ£€æµ‹
+			int tileGid = _collidable2->tileGIDAt(tiledpos);
+			if (tileGid > 0)
+			{
+				Value prop = _map->getPropertiesForGID(tileGid);
+				ValueMap propValueMap = prop.asValueMap();
+
+				std::string collision = propValueMap["collidable"].asString();
+
+				if (collision == "true")
+				{
+					return;
+				}
+			}
+			i->enemyMove();
 		}
-		else
+	}
+	for (auto& i : _enemies)
+	{
+		if (i->getPosition() == i->getDestination())
 		{
-			_command.isHeroStopMove = true;
+			i->setIsMoving(false);
 		}
-	}*/
+	}
 }
 
 void GameScene::updateFlyingItem()
@@ -256,15 +264,15 @@ void GameScene::updateFlyingItem()
 	}
 }
 
-//Ö¡¸üÐÂ
+//å¸§æ›´æ–°??æˆ‘çœ‹ä¸å‡ºæ¥åœ¨å“ªé‡Œè°ƒç”¨äº†è¯¥å‡½æ•°ï¼Œä½†æ˜¯ç¡®å®žè°ƒç”¨äº†
 void GameScene::update(float delta)
 {
 	updateFighterPosition();
 	updateFlyingItem();
+	updateEnemyPosition();
 
 
-
-	/*×Óµ¯»÷ÖÐÅÐ¶Ï
+	/*å­å¼¹å‡»ä¸­åˆ¤æ–­
 	for (auto it = _bullets.begin(); it != _bullets.end();)
 	{
 		if (!(*it)->getTarget()->getAlreadyDead())
@@ -289,7 +297,7 @@ void GameScene::update(float delta)
 		}
 	}*/
 
-	/*µÐÈËËÀÍöÅÐ¶Ï
+	/*æ•Œäººæ­»äº¡åˆ¤æ–­
 	for (auto it = _enemies.begin(); it != _enemies.end(); ++it)
 	{
 		if ((*it)->getAlreadyDead())
@@ -306,15 +314,16 @@ void GameScene::updateEnemiesAttackTarget()
 
 }
 
-//¹¥»÷·¶Î§
+//æ”»å‡»èŒƒå›´
 void GameScene::CircleDamage(Point point, float radius, float damage)
 {
 
 }
 
+
 bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	auto test = dynamic_cast<Testman*>(_myFighter);
+	auto test = dynamic_cast<Knight*>(_myFighter);
 	if (keyCode == EventKeyboard::KeyCode::KEY_J)
 	{
 		test->attack();
@@ -322,11 +331,15 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 	keys[keyCode] = true;
 	return true;
 }
+
+
 bool GameScene::onReleaseKey(EventKeyboard::KeyCode keyCode, Event* event)
 {
 	//keys[keyCode] = false;
 	return true;
 }
+
+
 bool GameScene::isKeyPressed(EventKeyboard::KeyCode keyCode)
 {
 	if (keys[keyCode])
