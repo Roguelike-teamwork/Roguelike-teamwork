@@ -1,5 +1,5 @@
 #include"EnemyRemote.h"
-#include "GameScene.h"
+#include "Scene/GameScene.h"
 #include"Bullet.h"
 #include"Fighter.h"
 
@@ -39,7 +39,7 @@ bool EnemyRemote::initData(GameScene* Scene, std::string enemyName)
 
 	attackSpeed = 0.5f;
 	hitPoints = 20;
-	curHitPoints = hitPoints;    //Êý¾Ý¾ßÌå»¯£¬²»¶¯ÓÃplist
+	curHitPoints = hitPoints;    //æ•°æ®å…·ä½“åŒ–ï¼Œä¸åŠ¨ç”¨plist
 
 	damageAbility = 2;
 	moveSpeed = 1.0;
@@ -59,18 +59,18 @@ bool EnemyRemote::attack()
 {
 	auto nowTime = GetCurrentTime() / 1000.f;
 
-	//Èç¹ûÔÚÔ¶³Ì¹¥»÷¶ÔÏó·¶Î§ÒÔÄÚ£¬Ôò´¥·¢¹¥»÷¶¯»­£¬ÇÐ±ØÐëÒªÔÚÉÏÒ»´Î¹¥»÷µÄÊ±¼ä¼ä¸ôÖ®ºó
-	//´ýÐ´
+	//å¦‚æžœåœ¨è¿œç¨‹æ”»å‡»å¯¹è±¡èŒƒå›´ä»¥å†…ï¼Œåˆ™è§¦å‘æ”»å‡»åŠ¨ç”»ï¼Œåˆ‡å¿…é¡»è¦åœ¨ä¸Šä¸€æ¬¡æ”»å‡»çš„æ—¶é—´é—´éš”ä¹‹åŽ
+	//å¾…å†™
 
 	if (attackTarget&& nowTime - lastAttackTime > (1.0f / attackSpeed))
 	{
 		auto bulletSprite = Bullet::create(CCString::createWithFormat("%sBullet", enemyName)->getCString(), damageAbility, flySpeed, this, attackTarget);
 
-		//¶Ô·ÉÐÐÎïµÄµ÷Õû
+		//å¯¹é£žè¡Œç‰©çš„è°ƒæ•´
 		bulletSprite->setPosition(this->getPosition());
 		//bulletSprite->setScale();
 
-		//½«·ÉÐÐÎï·ÅÈë³¡¾°µÄÈÝÆ÷Ö®ÖÐ
+		//å°†é£žè¡Œç‰©æ”¾å…¥åœºæ™¯çš„å®¹å™¨ä¹‹ä¸­
 		exploreScene->getMap()->addChild(bulletSprite);
 		exploreScene->flyingItem.pushBack(bulletSprite);
 
