@@ -21,15 +21,15 @@ class EnemyMelee :public Enemy
 public:
 
 
-	virtual bool attack();   //¹¥»÷£¬¸¸ÀàÖĞ´æÔÚ¶¨Òå£¬´Ë´¦Îª½üÕ½¹¥»÷£¬ÎŞ×Óµ¯¶¯»­
+	virtual bool attack();   //æ”»å‡»ï¼Œçˆ¶ç±»ä¸­å­˜åœ¨å®šä¹‰ï¼Œæ­¤å¤„ä¸ºè¿‘æˆ˜æ”»å‡»ï¼Œæ— å­å¼¹åŠ¨ç”»
 
 	static EnemyMelee* create(GameScene* Scene, std::string enemyName);
 	bool init(GameScene* Scene, std::string enemyName);
 	bool initData(GameScene* Scene, std::string enemyName);
 
-	//³ÔbuffĞ§¹û·Å×Å°Õ
+	//åƒbuffæ•ˆæœæ”¾ç€ç½¢
 	
-
+	void bindSprite(CCSprite* sprite);
 
 
 };
