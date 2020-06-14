@@ -2,75 +2,77 @@
 #define __GameScene_SCENE_H__
 
 #include "cocos2d.h"
-#include "MovingActor/Knight.h"
+#include "MovingActor/Fighter.h"
 #include "MovingActor/MovingActor.h"
 #include "MovingActor/Bullet.h"
 #include "Controller/MoveCtrl.h"
-#include "Const/MapInfo.h"
 #include <vector>
 
 USING_NS_CC;
 
 class Record;
+class MovingActor;
 
 class GameScene : public cocos2d::Scene
 {
-
+	Vector<Enemy*> _enemies;
 	/*
-	CC_SYNTHESIZE(varType, varName, funName)Õâ¸öºêÊÇÓÃÀ´
-	¶¨Òå±äÁ¿varName£¬ÆäÀàĞÍÎªvarType£¬²¢Éú³ÉÆäget/set·½·¨£¬·Ö±ğÎª£º
-		getfunName() ºÍ setfunName(varType var) ¡£
+	CC_SYNTHESIZE(varType, varName, funName)è¿™ä¸ªå®æ˜¯ç”¨æ¥
+	å®šä¹‰å˜é‡varNameï¼Œå…¶ç±»å‹ä¸ºvarTypeï¼Œå¹¶ç”Ÿæˆå…¶get/setæ–¹æ³•ï¼Œåˆ†åˆ«ä¸ºï¼š
+		getfunName() å’Œ setfunName(varType var) ã€‚
 	*/
 
-	//CC_SYNTHESIZE(Vector<Projectile*>, _bullets, Bullets);      ×Óµ¯
-	//CC_SYNTHESIZE(std::vector<Damage>, _damages, AllDamages);   ÉËº¦
+	//CC_SYNTHESIZE(Vector<Projectile*>, _bullets, Bullets);      å­å¼¹
+	//CC_SYNTHESIZE(std::vector<Damage>, _damages, AllDamages);   ä¼¤å®³
 	CC_SYNTHESIZE(Record*, _labelRecord, LabelRecord);
 	CC_SYNTHESIZE(Fighter*, _myFighter, MyFighter);
 	CC_SYNTHESIZE(MoveController*, _rocker, Rocker);
-	CC_SYNTHESIZE(Knight*, _myKnight, MyKnight);
 	CC_SYNTHESIZE(Size, _visibleSize, VisibleSize);
 	CC_SYNTHESIZE(Vec2, _origin, Origin);
 	CC_SYNTHESIZE(TMXTiledMap*, _map, Map);
-	CC_SYNTHESIZE(MapInfo, _mapInformation, MapInformation);
-	cocos2d::TMXTiledMap* _tileMap;
+	//CC_SYNTHESIZE(MapInfo, _mapInformation, MapInformation);
+	cocos2d::TMXLayer* _collidable;
+	cocos2d::TMXLayer* _collidable2;
 	Fighter* fighter;
 private:
-	//³õÊ¼»¯
+	//åˆå§‹åŒ–
 	void generateEnemies(float delta);
 	void initMapLayer();
 	void initFighter();
-	void initComp();
 	void initListener();
-	//¸üĞÂ½ÇÉ«Î»ÖÃ
+	void initComp();
+	//æ›´æ–°è§’è‰²ä½ç½®
 	void updateFighterPosition();
-	void setViewpointCenter(CCPoint position);
+	void updateEnemyPosition();
 	void updateFlyingItem();
 	void updateComp();
-	//¸üĞÂ¹¥»÷Ä¿±ê
+	bool _gameBegin;
+
+	//æ›´æ–°æ”»å‡»ç›®æ ‡
 	void updateEnemiesAttackTarget();
 
-	//¼àÌıÆ÷
+	//ç›‘å¬å™¨
 	EventListenerTouchOneByOne* listenerTouch;
 	EventListenerKeyboard* listenerKeyBoard;
 
-	//°´¼üÊÂ¼ş
+	//æŒ‰é”®äº‹ä»¶
 	virtual bool onPressKey(EventKeyboard::KeyCode keyCode, Event* event);
 	virtual bool onReleaseKey(EventKeyboard::KeyCode keyCode, Event* event);
 
-	//ÅĞ¶ÏÊÇ·ñÒ»Ö±±»°´×¡
+	//åˆ¤æ–­æ˜¯å¦ä¸€ç›´è¢«æŒ‰ä½
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keys;
 	bool isKeyPressed(EventKeyboard::KeyCode keyCode);
 	
-	void setSpritePoint(CCPoint position);
-	CCPoint tileCoordForPosition(CCPoint position);
+	void setViewpointCenter(Vec2);
+	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 
 
 public:
-	//¿ÉÒÔ¹«¿ªÊ¹ÓÃµÄÒ»Ğ©ÈİÆ÷
+	//å¯ä»¥å…¬å¼€ä½¿ç”¨çš„ä¸€äº›å®¹å™¨
 	Vector<MovingActor*> enemySoldier;
 	Vector<MovingActor*> enemyBoss;
 	Vector<MovingActor*> allFighter;
-	Vector<Equipment*> allWeapon;
+	Vector<Equipment*>allWeapon;
 	Vector<Bullet*> flyingItem;
 	//Vector<UnMovingActor*> allNpc;
 
