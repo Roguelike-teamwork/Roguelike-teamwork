@@ -14,6 +14,7 @@ class Enemy :public MovingActor
 	CC_SYNTHESIZE(String, enemyName, EnemyName);
 	CC_SYNTHESIZE(Vec2, destination, Destination);
 	CC_SYNTHESIZE(float, attackRadius, AttackRadius);
+	CC_SYNTHESIZE(EnemyLevel, level, Level);
 	CC_SYNTHESIZE(MovingActor*, fromFighter, FromFighter);
 	CC_SYNTHESIZE(EDirection, fDirecition, FDirection);
 
