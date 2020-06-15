@@ -1,5 +1,7 @@
 #include"Knight.h"
 #include"Scene/GameScene.h"
+#include"MovingActor/Equipment.h"
+#include"MovingActor/Bullet.h"
 //#include "HelloWorldScene.h"
 
 
@@ -75,10 +77,10 @@ bool Knight::attack()
 		for (int i = 0; i < fireTimes; i++)
 		{
 			auto bulletSprite = Bullet::create(CCString::createWithFormat("%sBullet", currentWeapon->getWeaponName())->getCString(),
-				currentWeapon->getAttackNumber(),
-				currentWeapon->getFlySpeed(),
-				this,
-				attackTarget);
+											   currentWeapon->getAttackNumber(),
+											   currentWeapon->getFlySpeed(),
+											   this,
+											   attackTarget);
 			bulletSprite->giveOut();
 			//bulletSprite->setScale();
 

@@ -3,10 +3,8 @@
 #define __MOVINGACTOR_H__
 #include<iostream>
 #include <string>
-#include <time.h>
 #include "cocos2d.h"
 #include "MovingActor/Constant.h"
-//#include "Scene/GameScene.h"
 
 USING_NS_CC;
 

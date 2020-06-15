@@ -33,11 +33,11 @@ bool Buff::init(EBuffType _bufftype,
     }
     //≥ı ºªØ Ù–‘
 
-    //buffType = _bufftype;
-    //buffHP = _buffHP;
-    //buffMP = _buffMP;
-    //buffMoveSpeed = _buffMoveSpeed;
-    //duration = _duration;
+    buffType = _bufftype;
+    buffHp = _buffHP;
+    buffMp = _buffMP;
+    buffMoveSpeed = _buffMoveSpeed;
+    duration = _duration;
 
 
     //

@@ -7,6 +7,7 @@
 
 USING_NS_CC;
 
+
 Scene* SafetyMap::createScene()
 {
 	return SafetyMap::create();
@@ -72,9 +73,9 @@ bool SafetyMap::init()
 	mu->setPosition(Vec2::ZERO);
 	this->addChild(mu, 1);
 
+
 	return true;
 }
-
 void SafetyMap::initMapLayer()
 {
 
@@ -85,11 +86,7 @@ void SafetyMap::initMapLayer()
 	auto size = _map->getBoundingBox().size;
     _map->setAnchorPoint(Vec2(0.5, 0.5));
     _map->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-	 //auto wallLayer = _map->getLayer("Wall");
-	//wallLayer->setZOrder(0);
-
-	//auto collisionLayer = _map->getLayer("collision");
-	//collisionLayer->setVisible(false);
+	
 	 addChild(_map, 0, 10000);//
 }
 
@@ -99,6 +96,13 @@ void SafetyMap::initMapLayer()
 
 	
 }*/
+
+void SafetyMap::initDiamond() 
+{
+	auto visibleSize = Director::getInstance()->getVisibleSize();//得到屏幕大小
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();//获得可视区域的出发点坐标，在处理相对位置时，确保节点在不同分辨率下的位置一致。
+
+}
 void SafetyMap::menuTestManCallBack(cocos2d::Ref* pSender)
 {
 	//转到testmanSelect

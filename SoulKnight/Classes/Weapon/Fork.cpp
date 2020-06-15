@@ -36,7 +36,7 @@ bool Fork::init(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
 
 	manaConsume = _manaConsume;
 
-	this->setTexture("ArtDesigning\\FlyingItem\\Weapon\\Fork.png");
+	this->setTexture("ArtDesigning/FlyingItem/Weapon/Fork.png");
 	this->setDamageRect(CCRectMake(0, 0, 20, 60));
 
 	return true;
@@ -118,7 +118,7 @@ bool Fork::cut()
 	
 
 	//生成攻击特效
-	auto flash = Sprite::create("ArtDesigning\\FlyingItem\\Bullet\\ForkEffect.png");
+	auto flash = Sprite::create("ArtDesigning/FlyingItem/Bullet/ForkEffect.png");
 	flash->setAnchorPoint(damageRect.origin);
 	flash->setRotation(angle);
 	auto action = Sequence::createWithTwoActions(DelayTime::create(0.5f),

@@ -15,7 +15,7 @@ public:
 
 	void menuAudioCallBack(cocos2d::Ref* pSender);
 	void menuExitCallBack(cocos2d::Ref* pSender);//返回上一场景
-
+	void menuPlayCallBack(cocos2d::Ref* pSender);//开始游戏
 
 	CREATE_FUNC(testmanSelect);
 };

@@ -1,4 +1,5 @@
 #include "testmanSelectScene.h"
+#include "GameScene.h"
 #include "SimpleAudioEngine.h" 
 #include "cocos2d.h"
 
@@ -25,7 +26,7 @@ bool testmanSelect::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();//得到屏幕大小
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();//获得可视区域的出发点坐标，在处理相对位置时，确保节点在不同分辨率下的位置一致。
 
-	//menu
+	//exitMenu
 	MenuItemImage* exitMenu = MenuItemImage::create(
 		"ArtDesigning/SceneAndMap/StartGame/EXIT.png",
 		"ArtDesigning/SceneAndMap/StartGame/EXITchosen.png",
@@ -44,6 +45,25 @@ bool testmanSelect::init()
 		float y = visibleSize.height - 550;
 		exitMenu->setPosition(Vec2(x, y));
 	}
+	//playMenu
+	MenuItemImage* playMenu = MenuItemImage::create(
+		"ArtDesigning/Word&Others/button/PLAY.png",
+		"ArtDesigning/Word&Others/button/PLAY.png",
+		CC_CALLBACK_1(testmanSelect::menuPlayCallBack, this)
+	);
+
+	if (playMenu == nullptr ||
+		playMenu->getContentSize().width <= 0 ||
+		playMenu->getContentSize().height <= 0)
+	{
+		problemLoading("'playMenu.png'");
+	}
+	else
+	{
+		float x = visibleSize.width / 4*3;
+		float y = visibleSize.height - 550;
+		playMenu->setPosition(Vec2(x, y));
+	}
 
 	//audio
 	auto offMusic = MenuItemImage::create("ArtDesigning/SceneAndMap/StartGame/on.png", "on.png");
@@ -57,7 +77,7 @@ bool testmanSelect::init()
 	audioMenu->setPosition(Vec2(visibleSize.width / 6 * 5 + 40, visibleSize.height - 180));
 
 	//mu
-	Menu* mu = Menu::create(exitMenu, audioMenu, NULL);
+	Menu* mu = Menu::create(exitMenu, playMenu,audioMenu, NULL);
 	mu->setPosition(Vec2::ZERO);
 	this->addChild(mu, 1);
 
@@ -85,6 +105,17 @@ void testmanSelect::menuExitCallBack(cocos2d::Ref* pSender)
 
 
 	log("Touch Exit Menu Item %p", item);
+}
+
+void testmanSelect::menuPlayCallBack(cocos2d::Ref* pSender)
+{
+	//开始游戏
+	auto nextScene = GameScene::create();
+	Director::getInstance()->replaceScene(
+		TransitionSlideInT::create(1.0f / 60, nextScene));
+	MenuItem* item = static_cast<MenuItem*>(pSender);
+	
+	log("Touch Play Menu Item %p", item);
 }
 void testmanSelect::menuAudioCallBack(cocos2d::Ref* pSender)
 {

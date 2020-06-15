@@ -3,11 +3,12 @@
 #define __EQUIPMENT_H__
 #include<iostream>
 #include"cocos2d.h"
-#include"MovingActor/Fighter.h"
+//#include"MovingActor/Fighter.h"
 #include"Constant.h"
 
 USING_NS_CC;
-                                      //存在不可解决的问题，不再用枚举类型
+
+class Fighter;
 
 class Equipment :public cocos2d::Sprite
 {

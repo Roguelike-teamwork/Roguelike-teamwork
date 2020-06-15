@@ -16,6 +16,7 @@ class SafetyMap :public cocos2d::Scene
 private:
 	//初始化
 	void initMapLayer();
+	void initDiamond();//右上角的钻石
 public:
 	static cocos2d::Scene* createScene();
 

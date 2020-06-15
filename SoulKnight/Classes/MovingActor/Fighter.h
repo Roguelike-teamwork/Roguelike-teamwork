@@ -5,11 +5,12 @@
 #include "MovingActor/MovingActor.h"
 #include "MovingActor/Constant.h"
 #include "MovingActor/Enemy.h"
-
+#include "MovingActor/Equipment.h"
+#include "MovingActor/Buff.h"
 
 USING_NS_CC;
 
-class Equipment;
+
 
 class Fighter :public MovingActor
 {
@@ -18,6 +19,7 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(EDirection, fdirection, FDirection);//人物的面向
 	CC_SYNTHESIZE(EDirection, ldirection, LDriection);//
 	CC_SYNTHESIZE(bool, isMoving, IsMoving);
+
 
 	CC_SYNTHESIZE(int, shield, Shield);                //护甲值上限
 	CC_SYNTHESIZE(int, curShield, CurShield);		   //当前护甲值
@@ -38,12 +40,14 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(float,lastReleaseTime,LastReleaseTime);
 	CC_SYNTHESIZE(float, lastSkillTime, LastSkillTime);      //技能持续时间
 	CC_SYNTHESIZE(float, skillCDTime, SkillCDTime);			//技能冷却时间
-
+	CC_SYNTHESIZE(EBuffType, state, State);
 	
-
+	CCSprite* m_sprite;
 public:
 
 	Vector<Equipment*> myWeapon;
+	
+	Vector<Buff*> myBuff;
 
 	virtual bool isFullEquipments();               //判断是否带满武器
 
@@ -57,7 +61,9 @@ public:
 
 	virtual void releaseSkill();               //发起技能
 
-	virtual void fighterMove();               //发起移动
+	virtual Vec2 updateDestination();
+
+	virtual void fighterMove(Vec2 newPosition);               //发起移动
 
 	virtual void stand();                     //停止移动后英雄的面向
 
@@ -75,12 +81,18 @@ public:
 
 	virtual void hurt(INT32 damage);                    //受伤
 
+	virtual void takeBuff(Buff* buff);
+
+	virtual void removeBuff();
+
+	virtual void initHealthComp();
+
+	virtual void bindSprite(CCSprite* sprite);
+
 protected:
 
 
 	ValueMap initFighterData;
-
-	Equipment* equips[INIT_EQUIP_NUMBER];  //武器栏初始化
 
 	virtual void die();                  //角色死亡时进行的操作
 

@@ -31,6 +31,12 @@ enum WeaponStatus
 	TAKEN
 };
 
+enum EnemyLevel
+{
+	SOLDIER,
+	BOSS
+};
+
 enum DamageMode      //伤害类型	
 {
 	POISONING,
@@ -74,7 +80,22 @@ enum keyPress
 
 
 //可能会
+typedef std::vector<std::vector<bool>> DyaDicVector;
+typedef struct PointINT
+{
+	INT32 x, y;
 
+	PointINT(INT32 x = 0, INT32 y = 0) :x(x), y(y) {}
+
+	PointINT& operator = (const cocos2d::Vec2& point)
+	{
+		x = static_cast<INT32>(point.x);
+		y = static_cast<INT32>(point.y);
+		return *this;
+	}
+
+
+}SizeINT;
 
 
 
