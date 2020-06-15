@@ -3,7 +3,7 @@
 #define __EQUIPMENT_H__
 #include<iostream>
 #include"cocos2d.h"
-#include"Constant.h"
+#include"MovingActor/Constant.h"
 
 USING_NS_CC;
 
@@ -21,8 +21,8 @@ public:
 	CC_SYNTHESIZE(int, attackNumber, AttackNumber);					 //攻击力数值
 	CC_SYNTHESIZE(float, attackSpeedNumber, AttackSpeedNumber);		//攻击速度数值
 	CC_SYNTHESIZE(float, flySpeed, FlySpeed);						//其子弹的飞行速度
-	CC_SYNTHESIZE(WeaponStatus, status, Status);					//武器的位置，人身上或地上
-
+	CC_SYNTHESIZE(WeaponStatus, nowState, NowState);					//武器的位置，人身上或地上
+	CC_SYNTHESIZE(bool,isCanPick,IsCanPick);
 	//如果是近战武器，则应有
 	CC_SYNTHESIZE(int, attackRadius, AttackRadius);               //攻击半径
 	//如果是远程武器，则应有（元气貌似无最远距离）触碰消失/反弹

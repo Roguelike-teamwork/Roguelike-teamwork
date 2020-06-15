@@ -2,6 +2,7 @@
 #include"Enemy/Dragon.h"
 #include"MovingActor/Constant.h"
 #include"MovingActor/Bullet.h"
+#include"MovingActor/Buff.h"
 #include"Scene/GameScene.h"
 #include<vector>
 
@@ -35,19 +36,27 @@ bool Dragon::initData(GameScene* Scene, std::string Name)
 
 	setTexture("ArtDesigning/Sprite/Enemy/Dragon/dragon1.png");
 
+	hitPoints = 1500;
+
 	alreadyDead = false;
-	attackSpeed = 0.f;
+	everAttack = false;
+	attackSpeed = 1.0f;
 	level = EnemyLevel::BOSS;
 
 	curHitPoints = hitPoints;
 	attackRadius = 500;
+
+	damageAbility = 1;
+	moveSpeed = 100;
+	identityRadius = 250;
+	attackRadius = 200;
 
 	isReleaseSkill_1 = false;
 	isReleaseSkill_2 = false;
 	isReleaseSkill_3 = false;
 	lastSkill = NOTHING;
 
-
+	loadAnimation();
 	this->runAction(normal);
 
 	return true;
@@ -55,26 +64,23 @@ bool Dragon::initData(GameScene* Scene, std::string Name)
 
 bool Dragon::loadAnimation()
 {
-	Vector<SpriteFrame*> normalFrames;
-	for (int i = 0; i < 2; i++)
+	Animation* normalAnimation = Animation::create();
+	for (int i = 1; i <= 2; i++)
 	{
-		SpriteFrame* frame = NULL;
-		frame = SpriteFrameCache::sharedSpriteFrameCache()->
-								  spriteFrameByName(CCString::createWithFormat("ArtDesigning/Sprite/Enemy/Dragon/dragon%d.png",i)->
-								  getCString());
-		normalFrames.pushBack(frame);
-	}
-	CCAnimation* normalAnimation = NULL;
-	normalAnimation = CCAnimation::createWithSpriteFrames(normalFrames,1.0/15.0);
-	this->setNormal(CCRepeatForever::create(CCAnimate::create(normalAnimation)));
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Enemy/Dragon/dragon%d.png", i);
+		normalAnimation->addSpriteFrameWithFileName(frameName->getCString());
 
+	}
+	normalAnimation->setDelayPerUnit(1.0f / 12.0f);
+	this->setNormal(CCRepeatForever::create(CCAnimate::create(normalAnimation)));
+	
 	return true;
 }
 
 void Dragon::chaosBullets()
 {
 			auto angle = random(0, 361);
-			auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet", enemyName)->getCString(), 2, flySpeed, this, NULL);
+			auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/DragonBullet.png", 2, 5, this, NULL);
 			//bulletSprite->setRotation(360 - angle);
 			bulletSprite->setAngle(angle);
 
@@ -90,8 +96,7 @@ void Dragon::roundBullets()
 	for (int i = 0; i < 20; i++)
 	{
 		auto angle = 18 * i;
-		auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet", enemyName)->getCString(), 2, flySpeed, this, NULL);
-		//bulletSprite->setRotation(360 - angle);  龙的子弹是圆的好像不需要这一步		
+		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/DragonBullet.png", 2, 5, this, NULL);	
 		bulletSprite->setAngle(angle);
 		auto fire = Buff::create(BURN, 0, 0, 0, 2.0f);
 		bulletSprite->setcarryBuff(fire);
@@ -102,21 +107,31 @@ void Dragon::roundBullets()
 
 void Dragon::groundFlame()
 {
-	Vec2 currentPosition;
+	//技能动画生成
+	Animation* bomb = Animation::create();
+	for (int i = 1; i <= 2; i++)
+	{
+		auto Name = String::createWithFormat("ArtDesigning/FlyingItem/Bullet/bomb%d.png",i);
+		bomb->addSpriteFrameWithFileName(Name->getCString());
+	}
+	bomb->setDelayPerUnit(0.5f);
+	Animate* action = Animate::create(bomb);
+	auto boom = Sequence::create(DelayTime::create(1.0f),
+								 Repeat::create(action, 1), 
+								 Hide::create(),
+								 NULL);
 
-	currentPosition = exploreScene->getMyFighter()->getPosition();
-	auto flash = Sprite::create("ArtDesigning/FlyingItem/Bullet/Flame.png");
-	auto action = Sequence::createWithTwoActions(DelayTime::create(1.0f),
-														 Hide::create());
-	flash->runAction(action);
-	flash->setPosition(currentPosition);
-	exploreScene->addChild(flash);
-
+	//
+	auto flash = Bullet::create("ArtDesigning/FlyingItem/Bullet/Flame.png", 2, 5, this, NULL);
+	flash->setPosition(exploreScene->getMyFighter()->getPosition());
+	flash->runAction(boom);
+	exploreScene->getMap()->addChild(flash);
+	//exploreScene->flyingItem.pushBack(flash);
 }
 
 void Dragon::updateState()
 {
-	auto nowTime = GetCurrentTime();
+	auto nowTime = GetCurrentTime()/1000.f;
 
 	if (!isReleaseSkill_1 && !isReleaseSkill_2 && !isReleaseSkill_3)
 	{
@@ -124,66 +139,66 @@ void Dragon::updateState()
 		if (lastSkill == NOTHING || (lastSkill == THREE && nowTime - endTime > 3.0f))
 		{
 			isReleaseSkill_1 = true;
-			startTime = GetCurrentTime();
+			startTime = GetCurrentTime()/1000.f;
 		}
 		else if (lastSkill == ONE && nowTime - endTime > 3.0f)
 		{
 			isReleaseSkill_2 = true;
-			startTime = GetCurrentTime();
+			startTime = GetCurrentTime()/1000.f;
 		}
 		else if (lastSkill == TWO && nowTime - endTime > 3.0f)
 		{
 			isReleaseSkill_3 = true;
-			startTime = GetCurrentTime();
+			startTime = GetCurrentTime()/1000.f;
 		}
-		eachTime = GetCurrentTime();
+		eachTime = GetCurrentTime()/1000.f;
 	}
 
 	if (isReleaseSkill_1)
 	{
-		if (nowTime - eachTime > 0.02f)
+		if (fabs(nowTime - eachTime) > 0.02f)
 		{
 			chaosBullets();
-			eachTime = GetCurrentTime();
+			eachTime = GetCurrentTime()/1000.f;
 		}
 
 		if (nowTime - startTime >= 6.0f)
 		{
 			isReleaseSkill_1 = false;
 			lastSkill = ONE;
-			endTime = GetCurrentTime();
+			endTime = GetCurrentTime()/1000.f;
 		}
 	}
 
 	if (isReleaseSkill_2)
 	{
-		if (nowTime - eachTime > 0.5f)
+		if (fabs(nowTime - eachTime) > 0.5f)
 		{
 			roundBullets();
-			eachTime = GetCurrentTime();
+			eachTime = GetCurrentTime()/1000.f;
 		}
 
 		if (nowTime - startTime >= 6.0f)
 		{
 			isReleaseSkill_2 = false;
 			lastSkill = TWO;
-			endTime = GetCurrentTime();
+			endTime = GetCurrentTime()/1000.f;
 		}
 	}
 
 	if (isReleaseSkill_3)
 	{
-		if (nowTime - eachTime > 2.0f)
+		if (fabs(nowTime - eachTime) > 2.0f)
 		{
 			groundFlame();
-			eachTime = GetCurrentTime();
+			eachTime = GetCurrentTime()/1000.f;
 		}
 
 		if (nowTime - startTime >= 6.0f)
 		{
 			isReleaseSkill_3 = false;
 			lastSkill = THREE;
-			endTime = GetCurrentTime();
+			endTime = GetCurrentTime()/1000.f;
 		}
 	}
 }

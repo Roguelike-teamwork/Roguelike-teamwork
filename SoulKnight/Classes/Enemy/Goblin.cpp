@@ -1,5 +1,6 @@
 #include"MovingActor/Enemy.h"
 #include"Enemy/Goblin.h"
+#include"MovingActor/Buff.h"
 #include"MovingActor/Constant.h"
 #include"MovingActor/Bullet.h"
 #include"Scene/GameScene.h"
@@ -35,14 +36,21 @@ bool Goblin::initData(GameScene* Scene, std::string Name)
 
 	setTexture("ArtDesigning/Sprite/Enemy/Goblin/Goblin1.png");
 
-	alreadyDead = false;
-	attackSpeed = 0.f;
 
-	curHitPoints = hitPoints;
-	attackRadius = 500;
+	attackSpeed = 2.0f;
+	hitPoints = 50;
+	curHitPoints = hitPoints;    //数据具体化，不动用plist
+
+	damageAbility = 1;
+	moveSpeed = 100;
+	identityRadius = 250;
+	attackRadius = 200;
+
+	alreadyDead = false;
+	everAttack = false;
 	level = SOLDIER;
 
-
+	loadAnimation();
 	this->runAction(normal);
 
 	return true;
@@ -50,17 +58,15 @@ bool Goblin::initData(GameScene* Scene, std::string Name)
 
 bool Goblin::loadAnimation()
 {
-	cocos2d::Vector<SpriteFrame*> normalFrames;
-	for (int i = 0; i < 2; i++)
+	//cocos2d::Vector<SpriteFrame*> normalFrames;
+	Animation* normalAnimation = Animation::create();
+	for (int i = 1; i <= 2; i++)
 	{
-		SpriteFrame* frame = NULL;
-		frame = SpriteFrameCache::sharedSpriteFrameCache()->
-			spriteFrameByName(CCString::createWithFormat("ArtDesigning/Sprite/Enemy/Goblin/Goblin%d.png", i)->
-				getCString());
-		normalFrames.pushBack(normalFrames);
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Enemy/Goblin/Goblin%d.png",i);
+		normalAnimation->addSpriteFrameWithFileName(frameName->getCString());
+
 	}
-	CCAnimation* normalAnimation = NULL;
-	normalAnimation = CCAnimation::createWithSpriteFrames(normalFrames, 1.0 / 15.0);
+	normalAnimation->setDelayPerUnit(1.0f / 12.0f);
 	this->setNormal(CCRepeatForever::create(CCAnimate::create(normalAnimation)));
 
 	return true;
@@ -72,12 +78,13 @@ bool Goblin::attack()
 
 	if (attackTarget)
 	{
-		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/GoblinBullet.png", damageAbility, flySpeed, this, attackTarget);
+		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/GoblinBullet.png", damageAbility, 5, this, attackTarget);
 
 		//对飞行物的调整
 		bulletSprite->setPosition(this->getPosition());
 		//bulletSprite->setScale();
 		auto fire = Buff::create(EBuffType::POISON, 0, 0, 0, 4.0f);
+		bulletSprite->giveOut();
 		bulletSprite->setcarryBuff(fire);
 		//将飞行物放入场景的容器之中
 		exploreScene->getMap()->addChild(bulletSprite);

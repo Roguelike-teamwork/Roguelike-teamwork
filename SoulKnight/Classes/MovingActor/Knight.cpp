@@ -28,7 +28,7 @@ bool Knight::init(GameScene* Scene, std::string Name)
 		return false;
 	}
 	//待初始化数据
-
+	hitPoints = 1000000;
 	//TBD
 
 	return true;
@@ -56,15 +56,17 @@ void Knight::stopSkill()
 
 bool Knight::attack()
 {
-	auto nowTime = GetCurrentTime();
+	if (!currentWeapon)
+		return false;
+	auto nowTime = GetCurrentTime()/1000.f;
+
+
 	if (nowTime - lastAttackTime < currentWeapon->getAttackSpeedNumber())
 		return false;
 
 
 	int fireTimes;
 	updateTarget();
-
-
 
 	if (isRelease)
 		fireTimes = 2;
@@ -76,7 +78,7 @@ bool Knight::attack()
 	{
 		for (int i = 0; i < fireTimes; i++)
 		{
-			auto bulletSprite = Bullet::create(CCString::createWithFormat("%sBullet", currentWeapon->getWeaponName())->getCString(),
+			auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet.png", currentWeapon->getWeaponName().getCString())->getCString(),
 											   currentWeapon->getAttackNumber(),
 											   currentWeapon->getFlySpeed(),
 											   this,
@@ -90,14 +92,14 @@ bool Knight::attack()
 			exploreScene->getMap()->addChild(bulletSprite);
 			exploreScene->flyingItem.pushBack(bulletSprite);
 		}
-		lastAttackTime = GetCurrentTime();
+		lastAttackTime = GetCurrentTime()/1000.f;
 		return true;
 	}
 	else if (!attackTarget)
 	{
 		for (int i = 0; i < fireTimes; i++)
 		{
-			auto bulletSprite = Bullet::create(CCString::createWithFormat("%sBullet", currentWeapon->getWeaponName())->getCString(),
+			auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet.png", currentWeapon->getWeaponName().getCString())->getCString(),
 				currentWeapon->getAttackNumber(),
 				currentWeapon->getFlySpeed(),
 				this,
@@ -112,10 +114,10 @@ bool Knight::attack()
 				bulletSprite->setPosition(Vec2(this->getPosition().x, this->getPosition().y + (2 * i - 1) * 20));
 
 			//bulletSprite->setScale();
-			exploreScene->addChild(bulletSprite);
+			exploreScene->getMap()->addChild(bulletSprite);
 			exploreScene->flyingItem.pushBack(bulletSprite);
 		}
-		lastAttackTime = GetCurrentTime();
+		lastAttackTime = GetCurrentTime()/1000.f;
 		return true;
 	}
 

@@ -93,16 +93,21 @@ Equipment* Fighter::changeMainEquip()    //待添加切换武器的音效
 {
 	if (isFullEquipments())
 	{
-		for (auto it=myWeapon.begin();it!=myWeapon.end();it++)
+		for (auto it = myWeapon.begin(); it != myWeapon.end(); it++)
 		{
 			if (currentWeapon != *it)
 				return *it;
 		}
 	}
+	else
+		return currentWeapon;
 }
 
 bool Fighter::attack()
 {
+	if (!currentWeapon)
+		return false;
+
 	updateTarget();
 
 	if (attackTarget)
@@ -212,7 +217,7 @@ Vec2 Fighter::updateDestination()       //
 	default:
 		break;
 	}
-	ldirection = direction;
+
 
 	return current;
 }
@@ -246,24 +251,35 @@ void Fighter::stand()
 void Fighter::updateTarget()
 {
 	MovingActor* tempTarget = NULL;
-	Vector<MovingActor*>& allEnemySoldier = exploreScene->enemySoldier;
-	Vector<MovingActor*>& allEnemyBoss = exploreScene->enemyBoss;
+	Vector<Enemy*>& allEnemySoldier = exploreScene->enemySoldier;
+	Vector<Enemy*>& allEnemyBoss = exploreScene->enemyBoss;
 
-	auto temp = allEnemyBoss.begin();
-	if (!(*temp)->getAlreadyDead() && !allEnemyBoss.empty())
+	if (allEnemySoldier.empty() && allEnemyBoss.empty())
 	{
-		tempTarget = *temp;
+		attackTarget = NULL;
+		return;
 	}
-	if (!tempTarget)
+	if (!allEnemyBoss.empty())
 	{
-		float tempRadius = identityRadius;
-		for (auto tempSoldier = allEnemySoldier.begin(); temp != allEnemySoldier.end(); ++tempSoldier)
+		auto temp = allEnemyBoss.begin();
+		if (!(*temp)->getAlreadyDead() && !allEnemyBoss.empty())
 		{
-			float calRadius= (*tempSoldier)->getPosition().getDistance(this->getPosition());
-			if (calRadius < tempRadius)
+			tempTarget = *temp;
+		}
+	}
+	if (!allEnemySoldier.empty())
+	{
+		if (!tempTarget)
+		{
+			float tempRadius = identityRadius;
+			for (auto tempSoldier = allEnemySoldier.begin(); tempSoldier != allEnemySoldier.end(); ++tempSoldier)
 			{
-				tempTarget = *tempSoldier;
-				tempRadius = calRadius;
+				float calRadius = (*tempSoldier)->getPosition().getDistance(this->getPosition());
+				if (calRadius < tempRadius)
+				{
+					tempTarget = *tempSoldier;
+					tempRadius = calRadius;
+				}
 			}
 		}
 	}
@@ -293,10 +309,15 @@ void Fighter::getWeapon(Equipment* available)
 		for (auto it = myWeapon.begin(); it != myWeapon.end(); it++)
 			if (currentWeapon == *it)
 			{
-				(*it)->setStatus(WeaponStatus::GROUND);
+				(*it)->setNowState(WeaponStatus::GROUND);
 				exploreScene->allWeapon.pushBack(*it);
 				*it = available;
 			}
+	}
+	else
+	{
+		myWeapon.pushBack(available);
+		currentWeapon = available;
 	}
 }
 

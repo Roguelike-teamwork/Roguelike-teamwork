@@ -28,6 +28,7 @@ bool Bullet::init(const std::string& filename, INT32 damage, float flySpeed, Mov
 	_flySpeed = flySpeed;
 	_owner = owner;
 	_victim = victim;
+	isToClean = false;
 
 	return true;
 }
@@ -35,7 +36,25 @@ bool Bullet::init(const std::string& filename, INT32 damage, float flySpeed, Mov
 void Bullet::giveOut()
 {
 	auto velocityVector = _victim->getPosition() - getPosition();
-	setAngle(acos(velocityVector.x / velocityVector.getLength()) / M_PI * 180);
+	float tempAngle;
+	auto tan = velocityVector.y / velocityVector.x;
+
+	if (tan > 0)
+	{
+		if (velocityVector.y > 0)
+			tempAngle = atan(velocityVector.y / velocityVector.x) / M_PI * 180;
+		else
+			tempAngle = atan(velocityVector.y / velocityVector.x) / M_PI * 180 +180;
+	}
+	else
+	{
+		if (velocityVector.x > 0)
+			tempAngle = atan(velocityVector.y / velocityVector.x) / M_PI * 180;
+		else
+			tempAngle = atan(velocityVector.y / velocityVector.x) / M_PI * 180 + 180;
+	}
+
+	setAngle(tempAngle);
 	setRotation(360-angle);
 }
 

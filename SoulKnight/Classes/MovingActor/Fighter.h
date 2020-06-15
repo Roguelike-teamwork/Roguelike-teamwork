@@ -85,7 +85,6 @@ public:
 
 	virtual void removeBuff();
 
-	virtual void initHealthComp();
 
 	virtual void bindSprite(CCSprite* sprite);
 

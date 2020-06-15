@@ -11,16 +11,14 @@ class Pistol :public Equipment
 {
 public:
 
-	virtual bool init(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
+	virtual bool init(EAttackMode _equipType, String _weaponName, int _attack,
 		float _attackSpeed, int _attackRadius, int _manaConsume
 	);
 
 
-
 	virtual bool init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname);
 
-
-	static Pistol* create(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
+	static Pistol* create(EAttackMode _equipType, String _weaponName, int _attack,
 		float _attackSpeed, int _attackRadius, int _manaConsume
 	);
 };

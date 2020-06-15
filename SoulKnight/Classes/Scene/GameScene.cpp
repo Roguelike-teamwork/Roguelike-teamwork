@@ -2,8 +2,12 @@
 #include "SimpleAudioEngine.h"
 #include "Controller/MoveCtrl.h"
 #include "cocos2d.h"
-#include "Const/MapInfo.h"
-#include"MovingActor/TestMan.h"
+//#include "Const/MapInfo.h"
+#include "Enemy/Dragon.h"
+#include"Enemy/Goblin.h"
+#include"MovingActor/Knight.h"
+#include"MovingActor/EnemyMelee.h"
+#include"Weapon/Pistol.h"
 
 USING_NS_CC;
 
@@ -27,7 +31,7 @@ bool GameScene::init()
 		return false;
 
 	}
-
+	_gameBegin = true;
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 	loadingAnimation();
@@ -35,64 +39,34 @@ bool GameScene::init()
 
 	initFighter();
 	initListener();
-	scheduleUpdate();
 
-	/*auto rocker = MoveController::createMoveController();
+	auto rocker = MoveController::createMoveController();
 	this->addChild(rocker);
-	_rocker = rocker;*/
+	_rocker = rocker;
 
+	generateEnemies(1);
 
-
-	
-
-	/*敌人生成
-	for (int i = 0; i < 4; i++)
-	{
-		auto soldier = Soldier::create(EAttackMode::REMOTE, ECamp::BLUE, ERoad::MIDWAY, this);
-		_map->addChild(soldier);
-		soldier->setPosition(200, 200 + rand() % 100 * 10);
-		soldier->setScale(0.3);
-		_soldiers.pushBack(soldier);
-	}*/
-
-
-
-
+	scheduleUpdate();
 	return true;
 }
+
 // https://blog.csdn.net/oyangyufu/article/details/26468973
-void GameScene::setViewpointCenter(CCPoint position)
+void GameScene::setViewpointCenter(Vec2 position)
 {
-	CCSize winSize = CCDirector::sharedDirector()->getWinSize();  
-	float x = MAX(position.x, winSize.width / 2);
-	float y = MAX(position.y, winSize.height / 2);  
-	x = MIN(x, (_map->getMapSize().width * _map->getTileSize().width) - winSize.width / 2);
-	y = MIN(y, (_map->getMapSize().height * _map->getTileSize().height) - winSize.height / 2); 	
-	CCPoint acturalPosition = ccp(x, y); 
-	CCPoint centerView = ccp(winSize.width / 2, winSize.height / 2);  
-	CCPoint viewPoint = ccpSub(centerView, acturalPosition);
-	this->setPosition(viewPoint);
+	auto visibleSize = Director::getInstance()->getVisibleSize();//有点问题：一进去的时候没有设置好位置
+	float x = MAX(position.x, visibleSize.width / 2);
+	float y = MAX(position.y, visibleSize.height / 2);
+	x = MIN(x, (_map->getMapSize().width * _map->getTileSize().width) - visibleSize.width / 2);
+	y = MIN(y, (_map->getMapSize().height * _map->getTileSize().height) - visibleSize.height / 2);
+	Vec2 pointA = Vec2(visibleSize.width / 2, visibleSize.height / 2);//屏幕中心点
+	Vec2 pointB = Vec2(x, y);//使精灵处于屏幕中心，移动地图目标位置；
+
+	//地图移动偏移量
+	Vec2 offset = pointA - pointB;
+	offset.y += 300;	
+	this->setPosition(offset);
 }
 
-void GameScene::setSpritePoint(CCPoint position)
-{
-	CCPoint tilecoord = this->tileCoordForPosition(position);//将坐标转换成tile坐标
-    CCTMXLayer* layer = _map->layerNamed("collision"); //获取地图层
-	int tilegid = layer->tileGIDAt(tilecoord);//获取图素GID值
-	CCLOG("tilegid: %d", tilegid);
-	if (tilegid)
-	{
-		CCDictionary* properties = _map->propertiesForGID(tilegid);//根据GID值获取图素属性键值集合
-		if (properties)
-		{
-			const CCString* str = properties->valueForKey("ShiTou");//键值名称
-			if (str && str->compare("true") == 0) 	 //键值
-			return;
-		}
-	}
-	fighter->setPosition(position);
-
-}
 void GameScene::initMapLayer()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -100,40 +74,48 @@ void GameScene::initMapLayer()
 
 	_map = CCTMXTiledMap::create("ArtDesigning/SceneAndMap/GameMap/GameMap1/GameMap1.tmx");
 	auto size = _map->getBoundingBox().size;
-	_map->setAnchorPoint(Vec2(0.5, 0.5));
-	_map->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-	_map->setScale(0.5);
-
-	auto collisionLayer = _map->getLayer("collision");
-	collisionLayer->setVisible(false);
-
+	_map->setAnchorPoint(Vec2(0,0));
+	_map->setPosition(Vec2(-200, -300));
+	int i = origin.x;
+	_collidable = _map->getLayer("collision");
+	_collidable->setVisible(false);
+	_collidable2 = _map->getLayer("collision2");
+	_collidable2->setVisible(false);
 	addChild(_map, 0, 10000);//TAG_MAP
 }
-CCPoint GameScene::tileCoordForPosition(CCPoint position)
+
+CCPoint GameScene::tileCoordForPosition(CCPoint pos)
+
 {
-	int x = position.x / _map->getTileSize().width;
-	int y = ((_map->getMapSize().height * _map->getTileSize().height) - position.y) / _map->getTileSize().height;
+	CCSize mapTiledNum = _map->getMapSize();
+	CCSize tiledSize = _map->getTileSize();
+	int x = pos.x / tiledSize.width;//转换为瓦块的个数横坐标 
+	int y = (mapTiledNum.height* tiledSize.height - pos.y) / tiledSize.height;//转换为瓦块的个数纵坐标
 	return ccp(x, y);
 }
-//刷新敌人？
+
+
+//生成敌人
 void GameScene::generateEnemies(float delta)
 {
-	if (true) //生成boss的条件
-	{
-		auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");
-		frame->setPosition(Vec2(512, 0));
-		this->addChild(frame);
+	//CCSprite* enemySprite = CCSprite::create("ArtDesigning/Sprite/Enemy/Goblin/Goblin1.png");
 
-		auto blood = Sprite::create("ArtDesigning/Word&Others/Comonent/YellowComp.png");
+	Enemy * enemyMelee_1 = Goblin::create(this, "Goblin");
+	//enemyMelee_1->bindSprite(enemySprite);
 
-		ProgressTimer* comp = ProgressTimer::create(blood);
-		comp->setType(ProgressTimer::Type::BAR);
-		comp->setPosition(Vec2(0, 512));
-		comp->setMidpoint(Vec2(0, 0.5));
-		comp->setBarChangeRate(Vec2(1, 0));
-		this->addChild(comp);
-	}
+	//加载对象层
+	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
+	//加载玩家坐标对象
+	ValueMap  playerPointDic = objGroup->objectNamed("SpawnPoint");
+	float playerX = playerPointDic.at("x").asFloat();
+	float playerY = playerPointDic.at("y").asFloat();
+	CCLOG("sprite postion x: %f, %f", playerX, playerY);
+	enemyMelee_1->setPosition(ccp(playerX, playerY));
+	_map->addChild(enemyMelee_1, 1);
+	enemySoldier.pushBack(enemyMelee_1);
+	//enemyBoss.pushBack(enemyMelee_1);
 }
+
 //初始化主角,目前少角色类（在多角色可选的前提下）
 void GameScene::initFighter()
 {
@@ -145,8 +127,10 @@ void GameScene::initFighter()
 	//玩家生成
 	//addFighter 源码 https://blog.csdn.net/u010778159/article/details/43956151?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
 	CCSprite* playerSprite = CCSprite::create("ArtDesigning/Sprite/Fighter/KnightDown.png");
-	fighter = Testman::create(this, "Ranger");
-	//fighter->bindSprite(playerSprite);
+	fighter = Knight::create(this, "Knight");
+	fighter->bindSprite(playerSprite);
+	allFighter.pushBack(fighter);
+
 	//加载对象层
 	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
 	//加载玩家坐标对象
@@ -157,11 +141,16 @@ void GameScene::initFighter()
 	fighter->setPosition(ccp(playerX, playerY));
 	_map->addChild(fighter, 1);
 	_myFighter = fighter;
+	setViewpointCenter(fighter->getPosition());
 
-	updateFighterPosition();
-	CCPoint sp_point = fighter->getPosition();
-	setViewpointCenter(sp_point); //设置视图中心点
+
+	//生成角色对应的武器
+	auto weapon = Pistol::create(EAttackMode::REMOTE,"Pistol",7,0.2,500,1);
+	weapon->setPosition(_myFighter->getPosition());
+	this->getMap()->addChild(weapon);
+	allWeapon.pushBack(weapon);
 }
+
 void GameScene::initListener()
 {
 	//创建键盘监听器
@@ -176,9 +165,7 @@ void GameScene::initComp()
 	auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");
 	frame->setPosition(Vec2(0, 750));
 	this->addChild(frame);
-
 	auto blood = Sprite::create("ArtDesigning/Word&Others/Comonent/RedComp.png");
-
 	ProgressTimer* comp = ProgressTimer::create(blood);
 	comp->setType(ProgressTimer::Type::BAR);
 	comp->setPosition(Vec2(0, 750));
@@ -186,14 +173,11 @@ void GameScene::initComp()
 	comp->setTag(FRIENDLY);
 	comp->setBarChangeRate(Vec2(1, 0));
 	this->addChild(comp);
-
 }
-
 void GameScene::updateComp()
 {
 	auto myComp = (ProgressTimer*)this->getChildByTag(FRIENDLY);
-	myComp->setPercentage((((float)_myFighter->getCurHitPoints())/_myFighter->getMaxHitpoints())*100);
-
+	myComp->setPercentage((((float)_myFighter->getCurHitPoints()) / _myFighter->getMaxHitpoints()) * 100);
 	if (!enemyBoss.empty())
 	{
 		auto it = enemyBoss.begin();
@@ -204,7 +188,7 @@ void GameScene::updateComp()
 //加载动画（一个旋涡状）
 void GameScene::loadingAnimation()
 {
-	
+
 }
 
 //更新主角位置
@@ -214,35 +198,80 @@ void GameScene::updateFighterPosition()
 	if (!_myFighter->getAlreadyDead())
 	{
 		_myFighter->setFDirection(_rocker->getFirstDirection());
-		_myFighter->setLDriection(_rocker->getLastDirection());
 		_myFighter->setDirection(_rocker->getDirection());
+		_myFighter->setLDriection(_rocker->getDirection());
+		_myFighter->setIsMoving(_rocker->getIsCanMove());
 	}
-	auto newPosition = _myFighter->getPosition();
+	auto newPosition = _myFighter->updateDestination();
+	CCPoint tiledpos = tileCoordForPosition(ccp(newPosition.x, newPosition.y));
+	CCLOG("tiled x = %f,y = %f", tiledpos.x, tiledpos.y);
 	//碰撞检测
-	/*if (_mapInformation.checkCollision(newPosition))
+	int tileGid = _collidable->tileGIDAt(tiledpos);
+	if (tileGid > 0) 
 	{
-		_myFighter->fighterMove();
-		if (nowTime - _myFighter->getLastAttackTime() > _myFighter->getMinAttackInterval() && _myFighter->getVertigoLastTo() < nowTime)
+		Value prop = _map->getPropertiesForGID(tileGid);
+		ValueMap propValueMap = prop.asValueMap();
+
+		std::string collision = propValueMap["collidable"].asString();
+
+		if (collision == "true")
 		{
-			_map->setPosition(_map->getPosition() - positionDelta);
+			return;
 		}
 	}
-		else
-		{
-			_command.isHeroMove = true;
-		}
-	}
+	setViewpointCenter(newPosition);
+	if(_myFighter->getIsMoving())
+		_myFighter->fighterMove(newPosition);
 	else
+		_myFighter->stand();
+}
+
+void GameScene::updateEnemyPosition()
+{
+	auto nowTime = GetCurrentTime() / 1000.f;
+	for (auto& i : enemySoldier)
 	{
-		if (_gameMode == 0)
+		if(i->getLevel()==EnemyLevel::SOLDIER)
+			i->updateAction();
+		else if(i->getLevel()==EnemyLevel::BOSS)
 		{
-			_myHero->stopMove();
+			auto it = dynamic_cast<Dragon*>(i);
+			it->updateState();
 		}
-		else
+		if (!i->getAlreadyDead()&&i->getIsMoving()==false)
 		{
-			_command.isHeroStopMove = true;
+			i->updateDestination();
+    		auto newPosition = i->getDestination();
+			if( !(newPosition.x >= 32 * 18 && newPosition.x <= 31 * 32 && newPosition.y >= 17 * 32 && newPosition.y <= 32 * 32))//注意瓦片地图的y方向与屏幕相反
+			{
+				return;
+			}
+			CCPoint tiledpos = tileCoordForPosition(ccp(newPosition.x, newPosition.y));
+			CCLOG("tiled x = %f,y = %f", tiledpos.x, tiledpos.y);
+			//碰撞检测
+			int tileGid = _collidable2->tileGIDAt(tiledpos);
+			if (tileGid > 0)
+			{
+				Value prop = _map->getPropertiesForGID(tileGid);
+				ValueMap propValueMap = prop.asValueMap();
+
+				std::string collision = propValueMap["collidable"].asString();
+
+				if (collision == "true")
+				{
+					return;
+				}
+			}
+			i->enemyMove();
 		}
-	}*/
+	}
+	for (auto& i : enemySoldier)
+	{
+		if (i->getPosition() == i->getDestination())
+		{
+			i->setIsMoving(false);
+		}
+	}
 }
 
 void GameScene::updateFlyingItem()
@@ -252,14 +281,97 @@ void GameScene::updateFlyingItem()
 		(*current)->fly();
 		current++;
 	}
+
+	for (auto current = flyingItem.begin(); current != flyingItem.end();current++)
+	{
+		if ((*current)->getOwner()==nullptr)
+		{
+			(*current)->setIsToClean(true);
+			continue;
+		}
+		if ((*current)->getOwner()->getCamp() == FRIENDLY)
+		{
+			if (!enemySoldier.empty())
+			{
+				for (auto& it : enemySoldier)
+				{
+					if (it->getPosition().getDistance((*current)->getPosition()) < 5)
+					{
+						it->takeDamage(DamageMode::COMMON, (*current)->getDamage(), (*current)->getOwner());
+						(*current)->setIsToClean(true);
+						break;
+					}
+				}
+			}
+			if (!enemyBoss.empty())
+			{
+				for (auto& it : enemyBoss)
+				{
+					if (it->getPosition().getDistance((*current)->getPosition()) < 5)
+					{
+						it->takeDamage(DamageMode::COMMON, (*current)->getDamage(), (*current)->getOwner());
+						(*current)->setIsToClean(true);
+						break;
+					}
+				}
+			}
+		}
+		if ((*current)->getOwner()->getCamp() == ENEMY)
+		{
+			//因为只有一个主角就这么写了
+			if (_myFighter->getPosition().getDistance((*current)->getPosition()) < 5)
+			{
+				_myFighter->hurt((*current)->getDamage());
+				(*current)->setIsToClean(true);
+			}
+		}
+	}
 }
 
-//帧更新
+void GameScene::clearObject()
+{
+	for (auto it = allWeapon.begin(); it != allWeapon.end();)
+	{
+		if ((*it)->getNowState() == WeaponStatus::TAKEN)
+		{
+			this->getMap()->removeChild(*it);
+			it = allWeapon.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+	for (auto it = flyingItem.begin(); it != flyingItem.end();)
+	{
+		if ((*it)->getIsToClean()||(*it)->getOwner()->getAlreadyDead())
+		{
+			this->getMap()->removeChild(*it);
+			it = flyingItem.erase(it);
+		}
+		else
+			++it;
+	}
+
+	for (auto it = enemySoldier.begin(); it != enemySoldier.end();)
+	{
+		if ((*it)->getAlreadyDead())
+		{
+			this->getMap()->removeChild(*it);
+			it = enemySoldier.erase(it);
+		}
+		else
+			++it;
+	}
+}
+
+//帧更新??我看不出来在哪里调用了该函数，但是确实调用了
 void GameScene::update(float delta)
 {
 	updateFighterPosition();
 	updateFlyingItem();
-
+	updateEnemyPosition();
+	clearObject();
 
 
 	/*子弹击中判断
@@ -297,6 +409,23 @@ void GameScene::update(float delta)
 	}*/
 }
 
+void GameScene::updateWeapon()
+{
+	for (auto& it : allWeapon)
+	{
+		auto distance = _myFighter->getPosition().getDistance(it->getPosition());
+		if (distance < 40)
+		{
+			tempWeapon = it;
+			it->setIsCanPick(true);
+			return;
+		}
+		else
+			it->setIsCanPick(false);
+	}
+	tempWeapon = NULL;
+}
+
 void GameScene::updateEnemiesAttackTarget()
 {
 
@@ -310,21 +439,42 @@ void GameScene::CircleDamage(Point point, float radius, float damage)
 
 }
 
+
 bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	auto test = dynamic_cast<Testman*>(_myFighter);
+	auto test = dynamic_cast<Knight*>(_myFighter);
 	if (keyCode == EventKeyboard::KeyCode::KEY_J)
 	{
 		test->attack();
 	}
+	if (keyCode == EventKeyboard::KeyCode::KEY_L)
+	{
+		updateWeapon();
+		for (auto& it : allWeapon)
+		{
+			if (it->getIsCanPick())
+			{
+				test->getWeapon(it);
+				it->setNowState(WeaponStatus::TAKEN);
+			}
+		}
+	}
+	if (keyCode == EventKeyboard::KeyCode::KEY_K)
+	{
+		test->setCurrentWeapon(test->changeMainEquip());
+	}
 	keys[keyCode] = true;
 	return true;
 }
+
+
 bool GameScene::onReleaseKey(EventKeyboard::KeyCode keyCode, Event* event)
 {
 	//keys[keyCode] = false;
 	return true;
 }
+
+
 bool GameScene::isKeyPressed(EventKeyboard::KeyCode keyCode)
 {
 	if (keys[keyCode])

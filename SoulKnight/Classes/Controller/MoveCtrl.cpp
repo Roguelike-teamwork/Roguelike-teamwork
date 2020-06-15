@@ -115,14 +115,20 @@ bool MoveController::updateDir()
 bool MoveController::onKeyPress(EventKeyboard::KeyCode keycode, Event* event)
 {
 	update(keycode,keyPress::PRESS);
-	if(keycode != EventKeyboard::KeyCode::KEY_J)
+	if (keycode != EventKeyboard::KeyCode::KEY_J && keycode != EventKeyboard::KeyCode::KEY_K && keycode != EventKeyboard::KeyCode::KEY_L)
+	{
+		isCanMove = true;
 		lastDirection = direction;
+	}
 	return true;
 }
 
 bool MoveController::onKeyRelease(EventKeyboard::KeyCode keycode, Event* event)
 {
 	update(keycode, keyPress::RELEASE);
+	if (keycode != EventKeyboard::KeyCode::KEY_J && keycode != EventKeyboard::KeyCode::KEY_K && keycode != EventKeyboard::KeyCode::KEY_L)
+	
+		isCanMove = false;
 
-	return true;
+		return true;
 }
