@@ -13,9 +13,11 @@ class MovingActor;
 
 class Bullet :public cocos2d::Sprite
 {
+	CC_SYNTHESIZE(EAttackMode,attackMode,AttackMode);
 	CC_SYNTHESIZE(INT32, _damage, Damage);
 	CC_SYNTHESIZE(bool, isToClean, IsToClean);
 	CC_SYNTHESIZE(float, _flySpeed, FlySpeed);
+	CC_SYNTHESIZE(float, giveOutTime, GiveOutTime);
 	CC_SYNTHESIZE(MovingActor*, _owner, Owner);
 	CC_SYNTHESIZE(MovingActor*, _victim, Victim);
 	CC_SYNTHESIZE(Buff*, carryBuff, carryBuff);

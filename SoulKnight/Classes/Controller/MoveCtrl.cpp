@@ -115,20 +115,25 @@ bool MoveController::updateDir()
 bool MoveController::onKeyPress(EventKeyboard::KeyCode keycode, Event* event)
 {
 	update(keycode,keyPress::PRESS);
-	if (keycode != EventKeyboard::KeyCode::KEY_J && keycode != EventKeyboard::KeyCode::KEY_K && keycode != EventKeyboard::KeyCode::KEY_L)
+	if (keycode != EventKeyboard::KeyCode::KEY_J && keycode != EventKeyboard::KeyCode::KEY_K && keycode != EventKeyboard::KeyCode::KEY_L && 
+		keycode != EventKeyboard::KeyCode::KEY_U)
 	{
-		isCanMove = true;
 		lastDirection = direction;
 	}
+	if (direction == NODIR)
+		isCanMove = false;
+	else
+		isCanMove = true;
 	return true;
 }
 
 bool MoveController::onKeyRelease(EventKeyboard::KeyCode keycode, Event* event)
 {
 	update(keycode, keyPress::RELEASE);
-	if (keycode != EventKeyboard::KeyCode::KEY_J && keycode != EventKeyboard::KeyCode::KEY_K && keycode != EventKeyboard::KeyCode::KEY_L)
-	
-		isCanMove = false;
 
-		return true;
+	if (direction == NODIR)
+		isCanMove = false;
+	else
+		isCanMove = true; 
+	return true;
 }

@@ -13,7 +13,7 @@ class Equipment :public cocos2d::Sprite
 {
 public:
 
-	CC_SYNTHESIZE(Fighter*, onwer, Onwer);
+	CC_SYNTHESIZE(Fighter*, owner, Owner);
 	CC_SYNTHESIZE(EAttackMode, equipType, EquipType);    //定义武器类型，远程or近战
 	CC_SYNTHESIZE(EEQUIPMENT, equipName, EquipName);	   //武器名字
 	

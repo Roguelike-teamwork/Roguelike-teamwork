@@ -1,7 +1,6 @@
 #include"MovingActor/Bullet.h"
 #include"MovingActor/MovingActor.h"
 
-#define PI 3.14
 
 Bullet* Bullet::create(const std::string& filename, INT32 damage, float flySpeed, MovingActor* owner, MovingActor* victim)
 {
@@ -22,12 +21,13 @@ bool Bullet::init(const std::string& filename, INT32 damage, float flySpeed, Mov
 
 	setTexture(filename);
 	setPosition(owner->getPosition());
-	//setScale();
 
 	_damage = damage;
 	_flySpeed = flySpeed;
 	_owner = owner;
 	_victim = victim;
+
+	//在达成某一条件后赋值true，让clearObject函数对其进行清理
 	isToClean = false;
 
 	return true;

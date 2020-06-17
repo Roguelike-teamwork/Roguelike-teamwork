@@ -63,7 +63,7 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 
 
 	identityRadius = INIT_ID_RADIUS;
-  
+ 
 	
 	equipNumber = INIT_EQUIP_NUMBER;
 
@@ -74,6 +74,8 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 	lastTimeInjured = 0.f;
 	isMoving = false;
 	//lastSkillTime = 0.f;
+	setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown.png", fighterName.getCString())->getCString());
+
 
 	curHitPoints = hitPoints;         //初始设定为满值
 	curShield = shield;		
@@ -180,7 +182,6 @@ void Fighter::hurt(INT32 damage)
 
 Vec2 Fighter::updateDestination()       //
 {
-	isMoving = true;
 	Vec2 current = this->getPosition();
 	switch (direction)
 	{
@@ -217,7 +218,21 @@ Vec2 Fighter::updateDestination()       //
 	default:
 		break;
 	}
-
+	switch (fdirection)
+	{
+	case EDirection::UP:
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sUp.png", fighterName.getCString())->getCString());
+		break;
+	case EDirection::DOWN:
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown.png", fighterName.getCString())->getCString());
+		break;
+	case EDirection::LEFT:
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sLeft.png", fighterName.getCString())->getCString());
+		break;
+	case EDirection::RIGHT:
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sRight.png", fighterName.getCString())->getCString());
+		break;
+	}
 
 	return current;
 }
@@ -233,16 +248,16 @@ void Fighter::stand()
 	switch (fdirection)
 	{
 	case EDirection::UP:
-		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sUp",fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sUp.png",fighterName.getCString())->getCString());
 		break;
 	case EDirection::DOWN:
-		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sDown", fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown.png", fighterName.getCString())->getCString());
 		break;
 	case EDirection::LEFT:
-		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sLeft", fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sLeft.png", fighterName.getCString())->getCString());
 		break;
 	case EDirection::RIGHT:
-		setTexture(CCString::createWithFormat("ArtDesigning\\Sprite\\Fighter\\%sRight", fighterName)->getCString());
+		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sRight.png", fighterName.getCString())->getCString());
 		break;
 	}
 	direction = EDirection::NODIR;

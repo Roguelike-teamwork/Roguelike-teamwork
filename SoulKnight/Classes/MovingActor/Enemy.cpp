@@ -123,7 +123,6 @@ void Enemy::die()
 void Enemy::updateAction()
 {
 	auto nowTime = GetCurrentTime()/1000.f;
-	CCLOG("nowTime=%f",nowTime);
 	if (everAttack)
 		if (nowTime - lastAttackTime < attackSpeed)
 			return;

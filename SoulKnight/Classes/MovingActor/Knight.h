@@ -12,6 +12,7 @@ class Knight :public Fighter
 {
 	
 	CC_SYNTHESIZE(bool,isRelease,IsRelease);
+	CC_SYNTHESIZE(bool, canRelease, CanRelease);
 	//Crit rate
 public:
 
@@ -21,9 +22,7 @@ public:
 
 	virtual void releaseSkill();               //发起技能
 
-	virtual void fullForce();                 //技能
-
-	virtual void stopSkill();
+	virtual void updateSkill();
 
 	virtual bool attack();
 };

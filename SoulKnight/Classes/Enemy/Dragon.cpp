@@ -93,9 +93,10 @@ void Dragon::chaosBullets()
 
 void Dragon::roundBullets()
 {
+	auto miniAngle = random(0, 18);
 	for (int i = 0; i < 20; i++)
 	{
-		auto angle = 18 * i;
+		auto angle = 18 * i + miniAngle;
 		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/DragonBullet.png", 2, 5, this, NULL);	
 		bulletSprite->setAngle(angle);
 		auto fire = Buff::create(BURN, 0, 0, 0, 2.0f);
@@ -121,11 +122,13 @@ void Dragon::groundFlame()
 								 Hide::create(),
 								 NULL);
 
-	//
-	auto flash = Bullet::create("ArtDesigning/FlyingItem/Bullet/Flame.png", 2, 5, this, NULL);
-	flash->setPosition(exploreScene->getMyFighter()->getPosition());
-	flash->runAction(boom);
-	exploreScene->getMap()->addChild(flash);
+	//ÉËº¦²¿·Ö
+	auto flame = Bullet::create("ArtDesigning/FlyingItem/Bullet/Flame.png", 2, 5, this, NULL);
+	flame->setPosition(exploreScene->getMyFighter()->getPosition());
+	flame->runAction(boom);
+	flame->setGiveOutTime(GetCurrentTime()/1000.f);
+	exploreScene->specialBullet.pushBack(flame);
+	exploreScene->getMap()->addChild(flame);
 	//exploreScene->flyingItem.pushBack(flash);
 }
 
@@ -188,7 +191,7 @@ void Dragon::updateState()
 
 	if (isReleaseSkill_3)
 	{
-		if (fabs(nowTime - eachTime) > 2.0f)
+		if (fabs(nowTime - eachTime) > 1.5f)
 		{
 			groundFlame();
 			eachTime = GetCurrentTime()/1000.f;

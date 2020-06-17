@@ -19,6 +19,7 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(EDirection, fdirection, FDirection);//人物的面向
 	CC_SYNTHESIZE(EDirection, ldirection, LDriection);//
 	CC_SYNTHESIZE(bool, isMoving, IsMoving);
+	CC_SYNTHESIZE(bool, canAttack, CanAttack);
 
 
 	CC_SYNTHESIZE(int, shield, Shield);                //护甲值上限

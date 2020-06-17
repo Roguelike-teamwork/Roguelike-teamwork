@@ -2,12 +2,12 @@
 #include "SimpleAudioEngine.h"
 #include "Controller/MoveCtrl.h"
 #include "cocos2d.h"
-//#include "Const/MapInfo.h"
 #include "Enemy/Dragon.h"
 #include"Enemy/Goblin.h"
 #include"MovingActor/Knight.h"
 #include"MovingActor/EnemyMelee.h"
 #include"Weapon/Pistol.h"
+#include"Weapon/Fork.h"
 
 USING_NS_CC;
 
@@ -22,7 +22,6 @@ static void problemLoading(const char* filename)
 	printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in GameSceneScene.cpp\n");
 
 }
-
 
 bool GameScene::init()
 {
@@ -98,10 +97,7 @@ CCPoint GameScene::tileCoordForPosition(CCPoint pos)
 //生成敌人
 void GameScene::generateEnemies(float delta)
 {
-	//CCSprite* enemySprite = CCSprite::create("ArtDesigning/Sprite/Enemy/Goblin/Goblin1.png");
-
 	Enemy * enemyMelee_1 = Goblin::create(this, "Goblin");
-	//enemyMelee_1->bindSprite(enemySprite);
 
 	//加载对象层
 	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
@@ -109,11 +105,10 @@ void GameScene::generateEnemies(float delta)
 	ValueMap  playerPointDic = objGroup->objectNamed("SpawnPoint");
 	float playerX = playerPointDic.at("x").asFloat();
 	float playerY = playerPointDic.at("y").asFloat();
-	CCLOG("sprite postion x: %f, %f", playerX, playerY);
+
 	enemyMelee_1->setPosition(ccp(playerX, playerY));
 	_map->addChild(enemyMelee_1, 1);
 	enemySoldier.pushBack(enemyMelee_1);
-	//enemyBoss.pushBack(enemyMelee_1);
 }
 
 //初始化主角,目前少角色类（在多角色可选的前提下）
@@ -126,9 +121,9 @@ void GameScene::initFighter()
 	
 	//玩家生成
 	//addFighter 源码 https://blog.csdn.net/u010778159/article/details/43956151?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
-	CCSprite* playerSprite = CCSprite::create("ArtDesigning/Sprite/Fighter/KnightDown.png");
+	//CCSprite* playerSprite = CCSprite::create("ArtDesigning/Sprite/Fighter/KnightDown.png");
 	fighter = Knight::create(this, "Knight");
-	fighter->bindSprite(playerSprite);
+	//fighter->bindSprite(playerSprite);
 	allFighter.pushBack(fighter);
 
 	//加载对象层
@@ -137,7 +132,7 @@ void GameScene::initFighter()
 	ValueMap  playerPointDic = objGroup->objectNamed("SpawnPoint");
 	float playerX = playerPointDic.at("x").asFloat();
 	float playerY = playerPointDic.at("y").asFloat();
-	CCLOG("sprite postion x: %f, %f", playerX, playerY);
+
 	fighter->setPosition(ccp(playerX, playerY));
 	_map->addChild(fighter, 1);
 	_myFighter = fighter;
@@ -149,6 +144,11 @@ void GameScene::initFighter()
 	weapon->setPosition(_myFighter->getPosition());
 	this->getMap()->addChild(weapon);
 	allWeapon.pushBack(weapon);
+
+	auto weapon_1 = Fork::create(EAttackMode::MELEE,"Fork",4,0.5f,100,2);
+	weapon_1->setPosition(Vec2(_myFighter->getPosition().x+100,_myFighter->getPosition().y+100));
+	this->getMap()->addChild(weapon_1);
+	allWeapon.pushBack(weapon_1);
 }
 
 void GameScene::initListener()
@@ -195,16 +195,27 @@ void GameScene::loadingAnimation()
 void GameScene::updateFighterPosition()
 {
 	auto nowTime = GetCurrentTime() / 1000.f;
-	if (!_myFighter->getAlreadyDead())
-	{
-		_myFighter->setFDirection(_rocker->getFirstDirection());
-		_myFighter->setDirection(_rocker->getDirection());
-		_myFighter->setLDriection(_rocker->getDirection());
-		_myFighter->setIsMoving(_rocker->getIsCanMove());
-	}
+
+
+	if (_myFighter->getAlreadyDead())
+		return;
+
+	auto it = dynamic_cast<Knight*>(_myFighter);
+	it->updateSkill();
+
+	if (it->getCanAttack())
+		it->attack();
+
+	_myFighter->setIsMoving(_rocker->getIsCanMove());
+	_myFighter->setFDirection(_rocker->getFirstDirection());
+	_myFighter->setDirection(_rocker->getDirection());
+	_myFighter->setLDriection(_rocker->getLastDirection());
+	
 	auto newPosition = _myFighter->updateDestination();
 	CCPoint tiledpos = tileCoordForPosition(ccp(newPosition.x, newPosition.y));
-	CCLOG("tiled x = %f,y = %f", tiledpos.x, tiledpos.y);
+
+
+
 	//碰撞检测
 	int tileGid = _collidable->tileGIDAt(tiledpos);
 	if (tileGid > 0) 
@@ -219,11 +230,15 @@ void GameScene::updateFighterPosition()
 			return;
 		}
 	}
+
+
 	setViewpointCenter(newPosition);
+
 	if(_myFighter->getIsMoving())
 		_myFighter->fighterMove(newPosition);
 	else
 		_myFighter->stand();
+
 }
 
 void GameScene::updateEnemyPosition()
@@ -247,7 +262,6 @@ void GameScene::updateEnemyPosition()
 				return;
 			}
 			CCPoint tiledpos = tileCoordForPosition(ccp(newPosition.x, newPosition.y));
-			CCLOG("tiled x = %f,y = %f", tiledpos.x, tiledpos.y);
 			//碰撞检测
 			int tileGid = _collidable2->tileGIDAt(tiledpos);
 			if (tileGid > 0)
@@ -284,18 +298,21 @@ void GameScene::updateFlyingItem()
 
 	for (auto current = flyingItem.begin(); current != flyingItem.end();current++)
 	{
+		//假如子弹的发出者死亡，子弹将被消除
 		if ((*current)->getOwner()==nullptr)
 		{
 			(*current)->setIsToClean(true);
 			continue;
 		}
+
+
 		if ((*current)->getOwner()->getCamp() == FRIENDLY)
 		{
 			if (!enemySoldier.empty())
 			{
 				for (auto& it : enemySoldier)
 				{
-					if (it->getPosition().getDistance((*current)->getPosition()) < 5)
+					if (it->getPosition().getDistance((*current)->getPosition()) < 10)
 					{
 						it->takeDamage(DamageMode::COMMON, (*current)->getDamage(), (*current)->getOwner());
 						(*current)->setIsToClean(true);
@@ -307,7 +324,7 @@ void GameScene::updateFlyingItem()
 			{
 				for (auto& it : enemyBoss)
 				{
-					if (it->getPosition().getDistance((*current)->getPosition()) < 5)
+					if (it->getPosition().getDistance((*current)->getPosition()) < 10)
 					{
 						it->takeDamage(DamageMode::COMMON, (*current)->getDamage(), (*current)->getOwner());
 						(*current)->setIsToClean(true);
@@ -319,10 +336,68 @@ void GameScene::updateFlyingItem()
 		if ((*current)->getOwner()->getCamp() == ENEMY)
 		{
 			//因为只有一个主角就这么写了
-			if (_myFighter->getPosition().getDistance((*current)->getPosition()) < 5)
+			if (_myFighter->getPosition().getDistance((*current)->getPosition()) < 10)
 			{
 				_myFighter->hurt((*current)->getDamage());
 				(*current)->setIsToClean(true);
+			}
+		}
+	}
+}
+
+void GameScene::updateSpecialBullet()
+{
+	auto nowTime = GetCurrentTime()/1000.f;
+	for (auto current = specialBullet.begin(); current != specialBullet.end(); current++)
+	{
+		//对Boss龙的第三技能产生的“子弹”进行处理
+		if ((*current)->getOwner()->getCamp() == AllCamp::FRIENDLY)
+		{
+			//Knight仅设计了一把近战武器--叉子
+			if (!enemySoldier.empty())
+			{
+				for (auto& it : enemySoldier)
+				{
+					if (it->getPosition().getDistance((*current)->getPosition()) < 40)
+					{
+						it->takeDamage(DamageMode::COMMON, (*current)->getDamage(), (*current)->getOwner());
+					}
+				}
+			}
+			if (!enemyBoss.empty())
+			{
+				for (auto& it : enemyBoss)
+				{
+					if (it->getPosition().getDistance((*current)->getPosition()) < 40)
+					{
+						it->takeDamage(DamageMode::COMMON, (*current)->getDamage(), (*current)->getOwner());
+					}
+				}
+			}
+
+			if (nowTime - (*current)->getGiveOutTime() > 1.0/15.0f)
+				(*current)->setIsToClean(true);
+		}
+		else
+		{
+			auto it = dynamic_cast<Enemy*>((*current)->getOwner());
+			if (it->getLevel() == BOSS)
+			{
+				if (nowTime - (*current)->getGiveOutTime() > 1.0f)
+				{
+					if (_myFighter->getPosition().getDistance((*current)->getPosition()) < 10)
+						_myFighter->hurt((*current)->getDamage());
+				}
+
+				if (nowTime - (*current)->getGiveOutTime() > 2.0f)
+					(*current)->setIsToClean(true);
+			}
+			else
+			{
+				if (_myFighter->getPosition().getDistance((*current)->getPosition()) < 10)
+					_myFighter->hurt((*current)->getDamage());
+				if(nowTime - (*current)->getGiveOutTime() > 0.3f)
+					(*current)->setIsToClean(true);
 			}
 		}
 	}
@@ -353,6 +428,17 @@ void GameScene::clearObject()
 			++it;
 	}
 
+	for (auto it = specialBullet.begin(); it != specialBullet.end();)
+	{
+		if ((*it)->getIsToClean() || (*it)->getOwner()->getAlreadyDead())
+		{
+			this->getMap()->removeChild(*it);
+			it = specialBullet.erase(it);
+		}
+		else
+			++it;
+	}
+
 	for (auto it = enemySoldier.begin(); it != enemySoldier.end();)
 	{
 		if ((*it)->getAlreadyDead())
@@ -370,6 +456,7 @@ void GameScene::update(float delta)
 {
 	updateFighterPosition();
 	updateFlyingItem();
+	updateSpecialBullet();
 	updateEnemyPosition();
 	clearObject();
 
@@ -445,7 +532,7 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 	auto test = dynamic_cast<Knight*>(_myFighter);
 	if (keyCode == EventKeyboard::KeyCode::KEY_J)
 	{
-		test->attack();
+		test->setCanAttack(true);
 	}
 	if (keyCode == EventKeyboard::KeyCode::KEY_L)
 	{
@@ -455,6 +542,7 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 			if (it->getIsCanPick())
 			{
 				test->getWeapon(it);
+				it->setOwner(test);
 				it->setNowState(WeaponStatus::TAKEN);
 			}
 		}
@@ -463,6 +551,14 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 	{
 		test->setCurrentWeapon(test->changeMainEquip());
 	}
+	if (keyCode == EventKeyboard::KeyCode::KEY_U)
+	{
+		if (test->getCanRelease())
+		{
+			test->releaseSkill();
+		}
+	}
+
 	keys[keyCode] = true;
 	return true;
 }
@@ -471,6 +567,9 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 bool GameScene::onReleaseKey(EventKeyboard::KeyCode keyCode, Event* event)
 {
 	//keys[keyCode] = false;
+	auto it = dynamic_cast<Knight*>(_myFighter);
+	if (keyCode == EventKeyboard::KeyCode::KEY_J)
+		it->setCanAttack(false);
 	return true;
 }
 

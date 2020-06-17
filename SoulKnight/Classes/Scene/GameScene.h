@@ -41,16 +41,17 @@ private:
 	void initFighter();
 	void initListener();
 	void initComp();
-	//更新角色位置
+	//update函数合集
 	void updateFighterPosition();
 	void updateEnemyPosition();
 	void updateFlyingItem();
+	void updateSpecialBullet();
 	void updateComp();
 	void updateWeapon();
 	void clearObject();
 	bool _gameBegin;
 
-	//更新攻击目标
+	//更新攻击目标   这个好像没用
 	void updateEnemiesAttackTarget();
 
 	//监听器
@@ -76,6 +77,7 @@ public:
 	Vector<MovingActor*> allFighter;
 	Vector<Equipment*>allWeapon;
 	Vector<Bullet*> flyingItem;
+	Vector<Bullet*> specialBullet;
 	//Vector<UnMovingActor*> allNpc;
 
 

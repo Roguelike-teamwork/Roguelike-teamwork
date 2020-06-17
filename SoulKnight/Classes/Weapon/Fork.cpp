@@ -1,11 +1,12 @@
 #include"Fork.h"
+#include"MovingActor/Bullet.h"
 #include"Scene/GameScene.h"
 
-Fork* Fork::create(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
+Fork* Fork::create(EAttackMode _equipType, String _weaponName, int _attack,
 	float _attackSpeed, int _attackRadius, int _manaConsume)
 {
 	Fork* equipment = new Fork();
-	if (equipment && equipment->init(_equipType, _equipname, _attack,
+	if (equipment && equipment->init(_equipType, _weaponName, _attack,
 		_attackSpeed, _attackRadius, _manaConsume))
 	{
 		equipment->autorelease();
@@ -19,7 +20,7 @@ Fork* Fork::create(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
 
 
 
-bool Fork::init(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
+bool Fork::init(EAttackMode _equipType, String _weaponName, int _attack,
 	float _attackSpeed, int _attackRadius, int _manaConsume)
 {
 	if (!Sprite::init())
@@ -28,7 +29,7 @@ bool Fork::init(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
 	}
 
 	equipType = _equipType;
-	equipName = _equipname;
+	weaponName = _weaponName;
 
 	attackNumber = _attack;
 	attackSpeedNumber = _attackSpeed;
@@ -37,7 +38,6 @@ bool Fork::init(EAttackMode _equipType, EEQUIPMENT _equipname, int _attack,
 	manaConsume = _manaConsume;
 
 	this->setTexture("ArtDesigning/FlyingItem/Weapon/Fork.png");
-	this->setDamageRect(CCRectMake(0, 0, 20, 60));
 
 	return true;
 }
@@ -58,8 +58,7 @@ bool Fork::init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname
 	attackRadius = data.at(2).asInt();
 	manaConsume = data.at(3).asInt();
 
-	this->setTexture("ArtDesigning\\FlyingItem\\Weapon\\Fork.png");
-	this->setDamageRect(CCRectMake(0, 0, 20, 60));
+
 
 	return true;
 
@@ -67,15 +66,32 @@ bool Fork::init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname
 
 bool Fork::cut()
 {
+	//两种不同的方式计算角度
 	float angle;
-	if (onwer->getAttackTarget())
+	if (owner->getAttackTarget())
 	{
-		auto victimVector = onwer->getAttackTarget()->getPosition() - onwer->getPosition();
-		angle = acos(victimVector.y / victimVector.getLength()) / M_PI * 180;
+		auto victimVector = owner->getAttackTarget()->getPosition() - owner->getPosition();
+		auto tan = victimVector.y / victimVector.x;
+
+		if (tan > 0)
+		{
+			if (victimVector.y > 0)
+				angle = atan(victimVector.y / victimVector.x) / M_PI * 180;
+			else
+				angle = atan(victimVector.y / victimVector.x) / M_PI * 180 + 180;
+		}
+		else
+		{
+			if (victimVector.x > 0)
+				angle = atan(victimVector.y / victimVector.x) / M_PI * 180;
+			else
+				angle = atan(victimVector.y / victimVector.x) / M_PI * 180 + 180;
+		}
 	}
-	else {
+	else
+	{
 		int sita = 0;
-		switch (onwer->getLDriection())
+		switch (owner->getLDriection())
 		{
 		case EDirection::RIGHT:
 			sita = 0;
@@ -109,22 +125,24 @@ bool Fork::cut()
 		}
 		angle = sita * 180 / 4;
 	}
-	//设置判定区域
-	onwerRect.origin = Vec2(onwer->getPosition().x - onwer->getBodySize().width / 2, onwer->getPosition().y - onwer->getBodySize().height);
-	onwerRect.size.width = onwer->getBodySize().width;
-	onwerRect.size.height = onwer->getBodySize().height;
-
-	damageRect.origin = Vec2(onwer->getPosition().x + 40 * cos(angle), onwer->getPosition().y + 40 * sin(angle));
 	
 
 	//生成攻击特效
-	auto flash = Sprite::create("ArtDesigning/FlyingItem/Bullet/ForkEffect.png");
-	flash->setAnchorPoint(damageRect.origin);
-	flash->setRotation(angle);
-	auto action = Sequence::createWithTwoActions(DelayTime::create(0.5f),
-												 Hide::create());
-	flash->runAction(action);
-	onwer->getExploreScene()->addChild(flash);
+
+	auto damage = Bullet::create("ArtDesigning/FlyingItem/Bullet/ForkEffect.png",
+								  4,
+								  0,
+								  owner,
+								  NULL);
+	damage->setAttackMode(MELEE);
+	damage->setPosition(owner->getPosition().x + 20 * cos(angle / 180 * M_PI),
+					    owner->getPosition().y + 20 * sin(angle / 180 * M_PI));
+	damage->setGiveOutTime(GetCurrentTime()/1000.f);
+	if (angle>=90&&angle<=270)
+		damage->setScaleX(-1.0);
+	owner->getExploreScene()->specialBullet.pushBack(damage);
+	owner->getExploreScene()->getMap()->addChild(damage);
 
 	return true;
 }
+
