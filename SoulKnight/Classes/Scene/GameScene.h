@@ -5,6 +5,7 @@
 #include "MovingActor/Fighter.h"
 #include "MovingActor/MovingActor.h"
 #include "MovingActor/Bullet.h"
+#include "MovingActor/UnMovingActor.h"
 #include "Controller/MoveCtrl.h"
 #include <vector>
 
@@ -27,13 +28,22 @@ class GameScene : public cocos2d::Scene
 	CC_SYNTHESIZE(Fighter*, _myFighter, MyFighter);
 	CC_SYNTHESIZE(MoveController*, _rocker, Rocker);
 	CC_SYNTHESIZE(Size, _visibleSize, VisibleSize);
+	CC_SYNTHESIZE(UnMovingActor*,currentNPC,CurrentNPC);
 	CC_SYNTHESIZE(Vec2, _origin, Origin);
 	CC_SYNTHESIZE(TMXTiledMap*, _map, Map);
 	CC_SYNTHESIZE(Equipment*,tempWeapon,TempWeapon);
+	CC_SYNTHESIZE(int, coinNum, CoinNum);
 	//CC_SYNTHESIZE(MapInfo, _mapInformation, MapInformation);
 	cocos2d::TMXLayer* _collidable;
 	cocos2d::TMXLayer* _collidable2;
-	Fighter* fighter;
+	cocos2d::TMXLayer* _fenceBool;
+	cocos2d::TMXLayer* _collisionForFight;
+	LabelTTF* hitpoints;
+	LabelTTF* shield;
+	LabelTTF* manapoints;
+	Label* coin;
+	Sprite* coinPicture;
+	bool collisionForFightBool = false;
 private:
 	//初始化
 	void generateEnemies(float delta);
@@ -41,8 +51,12 @@ private:
 	void initFighter();
 	void initListener();
 	void initComp();
+	void initCoin();
+	void initNextScene();
+	void initSettingMenu();
 	//update函数合集
 	void updateFighterPosition();
+	void updateNPC();
 	void updateEnemyPosition();
 	void updateFlyingItem();
 	void updateSpecialBullet();
@@ -57,6 +71,9 @@ private:
 	//监听器
 	EventListenerTouchOneByOne* listenerTouch;
 	EventListenerKeyboard* listenerKeyBoard;
+	//
+	void menuPlayCallBack(cocos2d::Ref* pSender);
+	void menuMenuCallBack(cocos2d::Ref* pSender);
 
 	//按键事件
 	virtual bool onPressKey(EventKeyboard::KeyCode keyCode, Event* event);
@@ -69,16 +86,17 @@ private:
 	void setViewpointCenter(Vec2);
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 
-
+	MenuItemImage* menuMenu;
 public:
 	//可以公开使用的一些容器
 	Vector<Enemy*> enemySoldier;
 	Vector<Enemy*> enemyBoss;
+	Vector<Enemy*> allEnemy;
 	Vector<MovingActor*> allFighter;
 	Vector<Equipment*>allWeapon;
 	Vector<Bullet*> flyingItem;
 	Vector<Bullet*> specialBullet;
-	//Vector<UnMovingActor*> allNpc;
+	Vector<UnMovingActor*> allNpc;
 
 
 	static cocos2d::Scene* createScene();

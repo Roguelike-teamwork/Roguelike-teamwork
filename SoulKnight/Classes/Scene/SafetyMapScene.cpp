@@ -1,6 +1,7 @@
 #include "SafetyMapScene.h"
 #include "StartGameScene.h"
 #include "testmanSelectScene.h"
+#include "MenuScene.h"
 #include "SimpleAudioEngine.h" 
 #include "MovingActor/Constant.h"
 #include "cocos2d.h"
@@ -31,7 +32,7 @@ bool SafetyMap::init()
 	audio->playBackgroundMusic("ArtDesigning/Audio/SafetyMap.mp3", true);
 	
 	initMapLayer();
-
+	initDiamond();
 	scheduleUpdate();
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();//得到屏幕大小
@@ -57,25 +58,33 @@ bool SafetyMap::init()
 		testManMenu->setPosition(Vec2(x, y));
 	}
 
-	
-	auto offMusic = MenuItemImage::create("ArtDesigning/SceneAndMap/StartGame/on.png", "on.png");
-	auto onMusic = MenuItemImage::create("ArtDesigning/SceneAndMap/StartGame/off.png", "off.png");
-	offMusic->setScale(0.5);
-	onMusic->setScale(0.5);
-	MenuItemToggle* audioMenu = MenuItemToggle::createWithCallback(
-		CC_CALLBACK_1(SafetyMap::menuAudioCallBack, this),
-		offMusic, onMusic, NULL
+	MenuItemImage* menuMenu = MenuItemImage::create(
+		"ArtDesigning/Word&Others/button/MENU.png",
+		"ArtDesigning/Word&Others/button/MENU.png",
+		CC_CALLBACK_1(SafetyMap::menuMenuCallBack, this)
 	);
-	audioMenu->setPosition(Vec2(visibleSize.width / 6 * 5 + 30, visibleSize.height - 180));
+
+	if (menuMenu == nullptr ||
+		menuMenu->getContentSize().width <= 0 ||
+		menuMenu->getContentSize().height <= 0)
+	{
+		problemLoading("'menuMenu .png'");
+	}
+	else
+	{
+		menuMenu->setPosition(Vec2(visibleSize.width / 6 * 5 + 30, visibleSize.height - 180));
+	}
 
 
-	Menu* mu = Menu::create(testManMenu,audioMenu, NULL);
+	Menu* mu = Menu::create(testManMenu,menuMenu, NULL);
 	mu->setPosition(Vec2::ZERO);
 	this->addChild(mu, 1);
 
 
 	return true;
 }
+
+
 void SafetyMap::initMapLayer()
 {
 
@@ -90,19 +99,38 @@ void SafetyMap::initMapLayer()
 	 addChild(_map, 0, 10000);//
 }
 
-
-/*void StartGame::menuStartCallBack(cocos2d::Ref* pSender)
+void SafetyMap::menuMenuCallBack(cocos2d::Ref* pSender)
 {
+	//转到菜单项(可返回)
+	auto nextScene = MenuScene::create();
+	Director::getInstance()->pushScene(nextScene);
+	MenuItem* item = static_cast<MenuItem*>(pSender);
 
-	
-}*/
+
+	log("Touch Menu Menu Item %p", item);
+}
 
 void SafetyMap::initDiamond() 
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();//得到屏幕大小
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();//获得可视区域的出发点坐标，在处理相对位置时，确保节点在不同分辨率下的位置一致。
-
+   
+	diamond = Label::createWithBMFont("fonts/Curlz.fnt", "100");//Label::createWithBMFont表示添加图片字体，”helvetica-32.fnt”为图片字体的格式，”Score:0”表示在屏幕上显示的得分信息 
+	this->addChild(diamond, 3);
+	float x = visibleSize.width / 6 * 5 - 20;
+	float y = visibleSize.height - 180;
+	diamond->setPosition(Vec2(x-20 , y+10));
+	//diamond->setScale(2);
+	diamond->setTag(TAG_layer_Score);
+	diamondPicture = Sprite::create("ArtDesigning/Word&Others/others/diamond.png");
+	this->addChild(diamondPicture, 3);
+	diamondPicture->setPosition(x - 60, y+10);
+	auto diamondBG = Sprite::create("ArtDesigning/Word&Others/others/diamondBG.png");
+	this->addChild(diamondBG, 2);
+	diamondBG->setScale(0.03);
+	diamondBG->setPosition(x - 30,y);
 }
+
 void SafetyMap::menuTestManCallBack(cocos2d::Ref* pSender)
 {
 	//转到testmanSelect
@@ -113,6 +141,7 @@ void SafetyMap::menuTestManCallBack(cocos2d::Ref* pSender)
 
 	log("Touch testmanSelect Menu Item %p", item);
 }
+
 void SafetyMap::menuAudioCallBack(cocos2d::Ref* pSender)
 {
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();

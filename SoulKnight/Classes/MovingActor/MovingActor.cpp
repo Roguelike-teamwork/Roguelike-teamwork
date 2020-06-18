@@ -47,10 +47,10 @@ void MovingActor::initData(GameScene* Scene)
 void MovingActor::takeDamage(DamageMode type, INT32 damage, MovingActor* enemy)
 {
 
-	hitPoints -= damage;
+	curHitPoints -= damage;
 	attackFrom = enemy;
-
-	if (hitPoints <= 0)
+	CCLOG("BOSS HP=%d", curHitPoints);
+	if (curHitPoints<= 0)
 		die();
 }
 

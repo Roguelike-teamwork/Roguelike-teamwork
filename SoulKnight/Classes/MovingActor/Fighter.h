@@ -26,6 +26,8 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(int, curShield, CurShield);		   //当前护甲值
 	CC_SYNTHESIZE(float, acRcoverSpeed, ACRcoverSpeed); //护甲刷新时间
 	CC_SYNTHESIZE(float, lastTimeInjured, LastTimeInjured); //最后受到伤害的时间，用于刷新护盾
+	CC_SYNTHESIZE(float, lastTimeRecover, LastTimeRecover);
+	CC_SYNTHESIZE(bool, canBeHurt, CanBeHurt);
 
 	CC_SYNTHESIZE(int, manaPoints, ManaPoints);			//法力值上限
 	CC_SYNTHESIZE(int, curManaPoints, CurManaPoints);	//当前法力值
@@ -42,6 +44,8 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(float, lastSkillTime, LastSkillTime);      //技能持续时间
 	CC_SYNTHESIZE(float, skillCDTime, SkillCDTime);			//技能冷却时间
 	CC_SYNTHESIZE(EBuffType, state, State);
+
+	CC_SYNTHESIZE(Action*,twink,Twink);
 	
 	CCSprite* m_sprite;
 public:
@@ -51,6 +55,8 @@ public:
 	Vector<Buff*> myBuff;
 
 	virtual bool isFullEquipments();               //判断是否带满武器
+
+	virtual void updateCondition();
 
 	virtual void getWeapon(Equipment* available);  //获得武器
 

@@ -1,15 +1,8 @@
 #include"UnMovingActor.h"
-//#include"GameScene"
+#include"Scene/GameScene.h"
+#include"Weapon/Fork.h"
 
 
-//
-//触发条件:
-//1.站在一定范围内
-//2.click - 次 / 攻击键点击 - 次
-//3跳出提示语言(商人 / 雕像 / 贩卖机) / 播放动画(宝箱)
-//4.再click - 次 / 攻击键点击 - 次表示确认
-//5.播放动画 / 隐藏精灵
-//6.获得bufF效果 / 扣除金钱获得武器 / 扣除金钱获得随机道具
 
 
 UnMovingActor* UnMovingActor::create(const std::string& filename, GameScene* Scene, TOTALNPC NPC, float radius)
@@ -33,86 +26,188 @@ bool UnMovingActor::init(const std::string& filename, GameScene* Scene, TOTALNPC
 		return false;
 	}
 
-	npcName = NPC;
-	if (NPC == BloodBox|| NPC == ManaBox || NPC == CoinBox)
-	{
-		isExploreBox == true;
-	}
-	else { isExploreBox == false; }
-
+	npcName = filename;
+	npcType = NPC;
+	isConfirm = false;
+	isOver = false;
+	isMeet = false;
+	_spawnScene = Scene;
 	touchRadius = radius;
 
+	setTexture(String::createWithFormat("ArtDesigning/Sprite/NPC/%s.png",npcName.getCString())->getCString());
 
+	
+	putMessages = Label::create("","Marker Felt",30);
+	putMessages->setPosition(400,70);
+	//putMessages->runAction(Hide::create());
+	_spawnScene->addChild(putMessages,5);
+	
+	return true;
 }
 
-bool UnMovingActor::isInRadius(MovingActor* fighter)  //写距离
+bool UnMovingActor::isInRadius(Fighter* fighter)  //写距离
 {
-	//if(){	//if(figher)
-
-
-
-
-	//return true;
- //   }
-	//else { return false; }
+	if (fighter->getPosition().getDistance(this->getPosition()) < touchRadius)
+		return true;
 	return false;
 }
 
-String UnMovingActor::talkFirstBack()             //不知道中文能不能使用
+
+void UnMovingActor::effect(Fighter* customer)
 {
-	switch (npcName)
+	auto action = Sequence::create(
+		Show::create(),
+		DelayTime::create(3.0f),
+		Hide::create(),
+		NULL
+	);
+	putMessages->runAction(action);
+
+	if (npcType == Businessman)
 	{
-	case TOTALNPC::Businessman:
-		return "万水千山总是情，买个装备行不行";
+		if (!isMeet)
+		{
+			goodsType = random(0, 3);
 		
-	case TOTALNPC::Statue:
-		return "我在佛前苦苦求了几千年，就为了给你加个Buff";
+		}
 
-	case TOTALNPC::Vending:
-		return "是欧皇就来搞我";
-	case TOTALNPC::BloodBox:
-		return "(￣▽￣)";
-	case TOTALNPC::ManaBox:
-		return "(￣▽￣)";
-	case TOTALNPC::CoinBox:
-		return "(￣▽￣)";
+		if (!isOver)
+		{
+			if (goodsType == 0)
+			{
+				if (!isConfirm)
+					putMessages->setString("HP 15Gold");
+				else
+				{
+					_spawnScene->setCoinNum(_spawnScene->getCoinNum() - 15);
+					customer->takeBuff(Buff::create(EBuffType::NORMAL,150,0,0,0));
+					isOver = true;
+				}
+			}
+			else if (goodsType == 1)
+			{
+				if (!isConfirm)
+					putMessages->setString("Energy 15Gold");
+				else
+				{
+					_spawnScene->setCoinNum(_spawnScene->getCoinNum() - 15);
+					customer->takeBuff(Buff::create(EBuffType::NORMAL, 0, 300, 0, 0));
+					isOver = true;
+				}
+			}
+			else if (goodsType == 2)
+			{
+				if(!isConfirm)
+					putMessages->setString("Fork 50Gold");
+				else
+				{
+					_spawnScene->setCoinNum(_spawnScene->getCoinNum() - 50);
+					auto goods = Fork::create(MELEE,"Fork",4,0.5f,100,2);
+					goods->setPosition(getPosition().x-50,getPosition().y-50);
+					_spawnScene->getMap()->addChild(goods);
+					_spawnScene->allWeapon.pushBack(goods);
+					isOver = true;
+				}
+			}
+		}
+		else
+		{
+			putMessages->setString("See You!!");
+		}
 	}
-	return "Unknown Wrong";
-}
-
-String UnMovingActor::talkSecondBack()        //二次对话，显示需要花的金币以及其他内容,注意此处宝箱应当直接跳过不调用该函数
-{
-	//待补充
-	return "Unknown Wrong";
-}
-
-
-
-void UnMovingActor::StartAnimation()                  
-{
-
-	auto animation = Animation::create();
-	//
-}
-
-Buff* UnMovingActor::buffBack()
-{
-	Buff* newbuff;
-	switch (npcName)
+	else if (npcType == Statue)
 	{
-	case TOTALNPC::BloodBox:
-		Buff* newbuff = Buff::create(SPEEDUP, 2, 0, 0.f, 0);
-		return newbuff;
-	case TOTALNPC::ManaBox:
-		Buff* newbuff = Buff::create(SPEEDUP, 0, 60, 0.f, 0);
-		return newbuff;
-	case TOTALNPC::CoinBox:
-		//Buff* newbuff = Buff::create(SPEEDUP, 2, 0, 0.f, 0);
-		return newbuff;
-	//buff类待添加的东西还很多
+		if (!isMeet)
+		{
+			goodsType = random(0, 2);
+			isMeet = true;
+		}
+		if (!isOver)
+		{
+			if (goodsType == 0)
+			{
+				if (!isConfirm)
+					putMessages->setString("SpeedUp 25Gold");
+				else
+				{
+					_spawnScene->setCoinNum(_spawnScene->getCoinNum() - 50);
+					customer->takeBuff(Buff::create(EBuffType::SPEEDUP,0,0,2,5000));
+					isOver = true;
+				}
+			}
+			if (goodsType == 1)
+			{
 
+				if (!isConfirm)
+					putMessages->setString("Fire if will 50Gold ");
+				else
+				{
+					_spawnScene->setCoinNum(_spawnScene->getCoinNum() -50);
+					customer->getCurrentWeapon()->setAttackSpeedNumber(customer->getCurrentWeapon()->getAttackSpeedNumber() / 2);
+					isOver = true;
+				}
+
+			}
+		}
+		else
+		{
+			putMessages->setString("I'm Exhausted,just leave me along");
+		}
+	}
+	else if (npcType == CoinBox)
+	{
+		if (!isOver)
+		{
+			if (!isConfirm)
+				putMessages->setString("You see something Gold inside");
+			else
+			{
+				_spawnScene->setCoinNum(_spawnScene->getCoinNum()+30);
+				isOver = true;
+			}
+		}
+		else
+		{
+			putMessages->setString("You take them,it full you with Determination");
+		}
+	}
+	else if (npcType == BloodBox)
+	{
+		if (!isOver)
+		{
+			if (!isConfirm)
+				putMessages->setString("Oh my god,it is bleeding");
+			else
+			{
+				customer->takeBuff(Buff::create(NORMAL,customer->getHitpoints()-customer->getCurHitPoints(),0,0,0));
+				isOver = true;
+			}
+		}
+		else
+		{
+			putMessages->setString("You Drink it,something recover");
+		}
+	}
+	else if (npcType == ManaBox)
+	{
+	if (!isOver)
+	{
+		if (!isConfirm)
+			putMessages->setString("Something shinning inside");
+		else
+		{
+			customer->takeBuff(Buff::create(NORMAL,0,customer->getManaPoints()-customer->getCurManaPoints(), 0, 0));
+			isOver = true;
+		}
+	}
+	else
+	{
+		putMessages->setString("You take them,it make you shinning");
+	}
 	}
 }
+
+
 
 Equipment* UnMovingActor::equipBack()
 {

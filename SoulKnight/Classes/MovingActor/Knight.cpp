@@ -29,9 +29,11 @@ bool Knight::init(GameScene* Scene, std::string Name)
 		return false;
 	}
 	//待初始化数据
-	hitPoints = 1000000;
+	hitPoints = 1000;
+	curHitPoints = hitPoints;
 	lastSkillTime = 5.0f;
 	skillCDTime = 10.0f;
+	moveSpeed = 4;
 	//TBD
 
 	return true;

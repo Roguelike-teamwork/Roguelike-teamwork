@@ -17,6 +17,8 @@
 #define INIT_MOVESPEED 3.0
 #define INIT_EQUIP_NUMBER 2
 
+#define TAG_layer_Score 0 
+
 
 enum EAttackMode	//	攻击模式,可以是武器的攻击模式，也可是怪物的攻击模式
 {

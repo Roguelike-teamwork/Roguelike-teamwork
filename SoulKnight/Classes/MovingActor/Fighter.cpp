@@ -52,21 +52,11 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 	fighterName = Name;
 	camp = AllCamp::FRIENDLY;
 
-	hitPoints = initFighterData["hitPoints"].asInt();     //利用plist的键值对
-	moveSpeed = initFighterData["MovingSpeed"].asFloat();
-	shield = initFighterData["shield"].asInt();
-	acRcoverSpeed = initFighterData["ACRecoverRate"].asInt();
-	manaPoints = initFighterData["manaPoints"].asInt();
-	critRate = initFighterData["critRate"].asFloat();
-  lastSkillTime = initFighterData["skillLastTime"].asFloat();
-	skillCDTime = initFighterData["skillCD"].asFloat();
-
-
 	identityRadius = INIT_ID_RADIUS;
  
-	
 	equipNumber = INIT_EQUIP_NUMBER;
 
+	canBeHurt = true;
 	alreadyDead = false;
 	attackSpeed = 0.f;
 	attackMode = MIX;
@@ -81,6 +71,10 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 	curShield = shield;		
 	curManaPoints = manaPoints;
 			
+
+
+
+
 	return true;
 }
 
@@ -172,13 +166,41 @@ void Fighter::hurt(INT32 damage)
 	}
 
 	if (currentDamage > 0)
-		hitPoints -= currentDamage;
-	currentDamage = 0;
+	{
+		curHitPoints -= currentDamage;
+		canBeHurt = false;
+		this->runAction(CCBlink::create(2.0f,10));
+	}
+		currentDamage = 0;
 
-	if (hitPoints <= 0)
+	if (curHitPoints <= 0)
 		die();
 }
 
+void Fighter::updateCondition()
+{
+	auto nowTime = GetCurrentTime()/1000.f;
+
+	if (isZeroSheild())
+	{
+		if (nowTime - lastTimeInjured > 3.0f)
+		{
+			if (nowTime - lastTimeRecover >= 1.0f)
+			{
+				curShield += 10;
+				lastTimeRecover = GetCurrentTime() / 1000.f;
+			}
+		}
+	}
+	if (!canBeHurt)
+	{
+		if (nowTime - lastTimeInjured > 2.0f)
+		{
+			canBeHurt = true;
+			runAction(Show::create());
+		}
+	}
+}
 
 Vec2 Fighter::updateDestination()       //
 {
@@ -186,32 +208,32 @@ Vec2 Fighter::updateDestination()       //
 	switch (direction)
 	{
 	case EDirection::UP:
-		current.y += INIT_MOVESPEED;
+		current.y += moveSpeed;
 		break;
 	case EDirection::UPLEFT:
-		current.x -= INIT_MOVESPEED;
-		current.y += INIT_MOVESPEED;
+		current.x -= moveSpeed;
+		current.y += moveSpeed;
 		break;
 	case EDirection::UPRIGHT:
-		current.x += INIT_MOVESPEED;
-		current.y += INIT_MOVESPEED;
+		current.x += moveSpeed;
+		current.y += moveSpeed;
 		break;
 	case EDirection::LEFT:
-		current.x -= INIT_MOVESPEED;
+		current.x -= moveSpeed;
 		break;
 	case EDirection::DOWN:
-		current.y -= INIT_MOVESPEED;
+		current.y -= moveSpeed;
 		break;
 	case EDirection::DOWNLEFT:
-		current.x -= INIT_MOVESPEED;
-		current.y -= INIT_MOVESPEED;
+		current.x -= moveSpeed;
+		current.y -= moveSpeed;
 		break;
 	case EDirection::DOWNRIGHT:
-		current.x += INIT_MOVESPEED;
-		current.y -= INIT_MOVESPEED;
+		current.x += moveSpeed;
+		current.y -= moveSpeed;
 		break;
 	case EDirection::RIGHT:
-		current.x += INIT_MOVESPEED;
+		current.x += moveSpeed;
 		break;
 	case EDirection::NODIR:
 		break;

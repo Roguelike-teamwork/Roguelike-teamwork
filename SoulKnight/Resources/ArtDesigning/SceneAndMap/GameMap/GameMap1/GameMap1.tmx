@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="80" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="8">
+<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="80" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="8">
  <tileset firstgid="1" name="source1" tilewidth="32" tileheight="32" tilecount="128" columns="8">
   <image source="source1.png" width="256" height="512"/>
  </tileset>
@@ -11,6 +11,7 @@
   <tile id="0">
    <properties>
     <property name="collidable" type="bool" value="true"/>
+    <property name="collisionForFighter" type="bool" value="false"/>
    </properties>
   </tile>
  </tileset>
@@ -50,12 +51,17 @@
  </tileset>
  <layer id="4" name="ground" width="80" height="80">
   <data encoding="base64" compression="zlib">
-   eJzt2rFuwkAQRVF/KaGCVEAFVJBPjyksGlZC+wYtoHOkqSe+QXGUzDQBAAAAADy2mucnmPWgvcnuSpt5tsH8Dtqb7K6kX0a/jH4Z/TIVz9Hz7kx3flO/UaOffvrlz7HvGP3uz3DqGO9f/W78/pfRL6NfZjf1vT+XORTvbbWq3F3pOPX9/F/mXLz30eey9Y7q3V3pMs81mL/iva1+lbu/Wasfz9Evo19Gv4x+Gf0y+mX0y+iX0S+jX+bT+o26X2v5tH6j/n7a+r619rj/q937Lp9L/TL6ZfTLuF/LuB/K6JfRL+N+LeP+KlPRr+f/7vplz6Cffjf6ZUber20H7a408n5t2d37NbzD/RoAAAAAvNI/9MB03A==
+   eJzt2l1LAlEUhtH5mxH0QZBF0AdBdVX99MYLiaADed6dZ9S1YN8J23kUR/RMEwAAAADA787mOQ/mYtDeZHel63lWwdwM2pvsrqRfRr+Mfhn9MhXX0XPvTHceUr9Ro59++uXX8dAx+n1fw2vHuP/qt+b7X0a/jH6Z+6nv/rmZx+K9rVaVuyu9TH2f/5t5K9772/uydY/q3V3pfZ6PYD6L97b6Ve4+ZK1+/I1+Gf0y+mX0y+iX0S+jX0a/jH4Z/TL71m/U+bWWfes36vfT1uvW2uP8X+3epbwv9cvol9Ev4/xaZknnh07mOd3i8fr9nMt5rrZ4vH76rafq/Nox9qs8f3Ws/Xr+d9cvuwb96vvdznO3g92VltTvaZ7nHeyuNPL82mrQ7kojz69tdvc+hyWcXwMAAACA//QFu990og==
+  </data>
+ </layer>
+ <layer id="13" name="fenceBool" width="80" height="80">
+  <data encoding="base64" compression="zlib">
+   eJzt0IEJADAIBDFXd3OHeKhYkgmOqwIAAAAAAAAAAAAAAAAAAACA93o74Dj/Mv5l/Mv4BwAAAAAAAP8ZVSsChg==
   </data>
  </layer>
  <layer id="6" name="collision" width="80" height="80" opacity="0.46">
   <data encoding="base64" compression="zlib">
-   eJzt0UEKxCAUBNFcPTef7TBkCLHFH/U1FFlJmfI8juMEAAAAAAAAgAt6rMrb6tYvc6/WL7mLftm99Bvv1i9zv61f5fTLpl82/bLpl22FfpXvpt949679rs7q99yTunft18utX+ZeGZ30029e9NNPv3nRTz/95kU//fSbF/326tdj+mWr8ra69cvcq/VL7qGfflXeVvfb+lVOv2z6ZdMvm37ZVuhX4T2/vvq1OVvd1f1+z870bpX9/p0d5b27zyz9evxHy67OztTv7r9Ge1vdAAAAAAAAAPbgA+EL6rU=
+   eJzt0dEOgjAQBVF+nT/3ETUosltZ2p6bTEw0Zcq4LsuyAgAAAAAAAMAOLVbljbr1y7lH65e5i365e+l3vVu/nPtu/SqnX2765aZfbvrlNkK/yv9Nv+vds/bbO6vfeU/WPWu/Vm79cu6R0Uk//fpFP/306xf99NOvX/TTT79+0W+ufi2mX25V3qhbv5x7tH6Ze+inX5U36r5bv8rpty1yJ/226ZebfrnN2q+V98yd1qdP/V6f86sz6q7u9362ol/UW9nv09l/9zv6vrd+Ld7jzPO//d5Tv6P3utobdQMAAAAAAACYgwcRzPPH
   </data>
  </layer>
  <layer id="7" name="tree" width="80" height="80">
@@ -65,11 +71,11 @@
  </layer>
  <layer id="5" name="fence" width="80" height="80">
   <data encoding="base64" compression="zlib">
-   eJzt2rENgDAMBMDs37ABbEBWJBQ0NBQfpTB30pduvrIstwYAAAAAAABUsY8cC2aqOkf6gpmq9JfRX0Z/AMDf3bvN9opdBwAAAGAe9xcA+OZ/LeP/JaO/jP4y+gMAAAAAAAAeF91VIfc=
+   eJzt2jEKgDAMBdDef/EG9gZ6RSuli4vQSIf4Hvwxy59CSCkAAAAAAABAFntLXTCT1dFyLpjJSn8x+ovRHwDwd/dusz1i1wEAAAD4jvsLALyb/V+jm/1/odNfjP5i9AcAAAAAAAAMF40DHpw=
   </data>
  </layer>
  <objectgroup id="8" name="objects">
-  <object id="1" name="SpawnPoint" x="601" y="1910" width="44" height="58">
+  <object id="1" name="SpawnPoint" x="681" y="1764" width="44" height="58">
    <ellipse/>
   </object>
   <object id="3" name="enemy1" x="1756" y="1672" width="102" height="106">
@@ -78,7 +84,12 @@
  </objectgroup>
  <layer id="10" name="collision2" width="80" height="80" opacity="0.35">
   <data encoding="base64" compression="zlib">
-   eJzt27EOABAMBUC/7s8tRgY60PQu6dzmTYS2BgAAAAAArPRZ3OmLAgAAeMndJEZ+AAAAAABAFt40YuQHAFTgzBOTOb9f/kH9MMOJVztCu35Z86vaHwAAAACgkgEdzg6e
+   eJzt27EKgCAUhlFf3TdvacsK+7G4dA64NNzhgxKRWgMAAAAAAEb6vnimDxYAAMCXnE0y+gEAAAAAAFW408joB/W5383ol9Evo19mpp/OR3/pt+o9m51breHqf4TO5l49r2T19/1uvv0FAAAAAOA9G06AF7A=
+  </data>
+ </layer>
+ <layer id="11" name="collisionForFight" width="80" height="80" opacity="0.51">
+  <data encoding="base64" compression="zlib">
+   eJzt1bENADAMw7C8ns97QSZtBQn4AS2eAQAAAAAAAAAAAAAAAAAALnsMAGj8aaNfo1+jX6MfAAAAAAAA/OkBiskFjA==
   </data>
  </layer>
 </map>
