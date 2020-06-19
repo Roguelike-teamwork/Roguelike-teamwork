@@ -62,12 +62,12 @@ void  Enemy::updateTarget()
 void Enemy::updateDestination()
 {
 	Vec2 tempDes;
-	if (!attackTarget)
+	if (!attackTarget||level==BOSS)
 	{
 		float tempX, tempY;
 
-		tempX = random(-50, 50) ;//如果过大，将出界，因为界外没有瓦片,不对其进行碰撞检测，直接框在房间里
-		tempY = random(-50, 50) ;
+		tempX = random(-30, 30) ;//如果过大，将出界，因为界外没有瓦片,不对其进行碰撞检测，直接框在房间里
+		tempY = random(-30, 30) ;
 
 
 		tempDes.x = getPosition().x + tempX;
@@ -136,7 +136,7 @@ void Enemy::updateAction()
 				everAttack = true;
 				lastAttackTime = GetCurrentTime()/1000.f;
 			}
-			if (distance < attackRadius - 50)
+			if (distance < attackRadius - 50&&attackMode==REMOTE)
 				isToMove = false;
 			else
 				isToMove = true;

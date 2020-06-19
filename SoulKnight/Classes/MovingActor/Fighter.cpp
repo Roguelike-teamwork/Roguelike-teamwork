@@ -148,17 +148,18 @@ bool Fighter::isInMelee()           //判断enemy位于范围内，暂时不会�
 
 void Fighter::hurt(INT32 damage)
 {
+	CCLOG("HP=%d MP=%d SP=%d", curHitPoints, curManaPoints, curShield);
 	int currentDamage = damage;
 	if (!isZeroSheild())
 	{
-		if (currentDamage >= shield)
+		if (currentDamage >= curShield)
 		{
-			currentDamage -= shield;
-			shield = 0;
+			currentDamage -= curShield;
+			curShield = 0;
 		}
 		else
 		{
-			shield -= currentDamage;
+			curShield -= currentDamage;
 			currentDamage = 0;
 		}
 	}
@@ -174,13 +175,20 @@ void Fighter::hurt(INT32 damage)
 		die();
 }
 
+bool Fighter::isFullShield()
+{
+	if (curShield == shield)
+		return true;
+	return false;
+}
+
 void Fighter::updateCondition()
 {
 	auto nowTime = GetCurrentTime()/1000.f;
 	setVisible(true);
-	if (isZeroSheild())
+	if (!isFullShield())
 	{
-		if (nowTime - lastTimeInjured > 3.0f)
+		if (nowTime - lastTimeInjured > 5.0f)
 		{
 			if (nowTime - lastTimeRecover >= 1.0f)
 			{
@@ -189,6 +197,34 @@ void Fighter::updateCondition()
 			}
 		}
 	}
+
+	if (state == BURN)
+	{
+		for (auto& it : myBuff)
+		{
+			if (it->getTag() == 10795)
+			{
+				if (nowTime - it->getBeginTime() >= 2.0f)
+				{
+					hurt(20);
+				}
+			}
+		}
+	}
+	else if (state == POISON)
+	{
+		for (auto& it : myBuff)
+		{
+			if (it->getTag() == 10795)
+			{
+				if (nowTime - it->getBeginTime() >= 1.0f)
+				{
+					hurt(10);
+				}
+			}
+		}
+	}
+
 	if (!canBeHurt)
 	{
 		if (!isPlay)
@@ -196,7 +232,7 @@ void Fighter::updateCondition()
 			runAction(Blink::create(2.0f,250));
 			isPlay = true;
 		}
-		if (nowTime - lastTimeInjured >= 2.0f)
+		if (nowTime - lastTimeInjured >= 1.0f)
 		{
 			canBeHurt = true;
 		}
@@ -436,9 +472,11 @@ void Fighter::takeBuff(Buff* buff)
 	this->curManaPoints += buff->getBuffMp();
 	this->moveSpeed += buff->getBuffMoveSpeed();
 
-	if (state == EBuffType::NORMAL)
+	if ((buff->getBuffType() == BURN || buff->getBuffType() == POISON)&&state==COMMON)
+	{
 		state = buff->getBuffType();
-
+		buff->setTag(10795);
+	}
 	buff->setBeginTime(GetCurrentTime());
 
 	this->myBuff.pushBack(buff);

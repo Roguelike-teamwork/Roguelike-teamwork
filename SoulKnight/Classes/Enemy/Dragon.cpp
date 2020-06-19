@@ -43,6 +43,7 @@ bool Dragon::initData(GameScene* Scene, std::string Name)
 	damageAbility = DRAGON_DAMAGE;
 	moveSpeed = DRAGON_MOVESPEED;
 	identityRadius = INIT_ID_RADIUS;
+	flySpeed = DRAGON_FLYSPEED;
 
 	alreadyDead = false;
 	everAttack = false;
@@ -76,7 +77,7 @@ bool Dragon::loadAnimation()
 void Dragon::chaosBullets()
 {
 			auto angle = random(0, 361);
-			auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/DragonBullet.png", 2, 5, this, NULL);
+			auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/DragonBullet.png", damageAbility, flySpeed, this, NULL);
 			//bulletSprite->setRotation(360 - angle);
 			bulletSprite->setAngle(angle);
 
@@ -93,7 +94,7 @@ void Dragon::roundBullets()
 	for (int i = 0; i < 20; i++)
 	{
 		auto angle = 18 * i + miniAngle;
-		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/DragonBullet.png", 2, 5, this, NULL);	
+		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/DragonBullet.png", damageAbility, flySpeed, this, NULL);	
 		bulletSprite->setAngle(angle);
 		auto fire = Buff::create(BURN, 0, 0, 0, 2.0f);
 		bulletSprite->setcarryBuff(fire);
@@ -119,7 +120,7 @@ void Dragon::groundFlame()
 								 NULL);
 
 	//ÉËº¦²¿·Ö
-	auto flame = Bullet::create("ArtDesigning/FlyingItem/Bullet/Flame.png", 2, 5, this, NULL);
+	auto flame = Bullet::create("ArtDesigning/FlyingItem/Bullet/Flame.png", damageAbility, 5, this, NULL);
 	flame->setPosition(exploreScene->getMyFighter()->getPosition());
 	flame->runAction(boom);
 	flame->setGiveOutTime(GetCurrentTime()/1000.f);
@@ -155,7 +156,7 @@ void Dragon::updateState()
 
 	if (isReleaseSkill_1)
 	{
-		if (fabs(nowTime - eachTime) > 0.02f)
+		if (fabs(nowTime - eachTime) > 0.005f)
 		{
 			chaosBullets();
 			eachTime = GetCurrentTime()/1000.f;

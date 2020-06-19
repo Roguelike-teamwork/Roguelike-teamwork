@@ -2,6 +2,7 @@
 #include "SimpleAudioEngine.h"
 #include "Controller/MoveCtrl.h"
 #include "cocos2d.h"
+#include "Comp/Comp.h"
 #include "Enemy/Dragon.h"
 #include"Enemy/Goblin.h"
 #include"Enemy/Pig.h"
@@ -56,7 +57,7 @@ bool GameScene::init()
 	_rocker = rocker;
 
 	generateEnemies(1);
-	
+	generateComp();
 
 	scheduleUpdate();
 	return true;
@@ -211,7 +212,7 @@ CCPoint GameScene::tileCoordForPosition(CCPoint pos)
 //生成敌人
 void GameScene::generateEnemies(float delta)
 {
-	Enemy * enemyMelee_1 = Pig::create(this, "Pig");
+	Enemy * enemyMelee_1 = Dragon::create(this, "Dragon");
 
 	//加载对象层
 	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
@@ -222,7 +223,7 @@ void GameScene::generateEnemies(float delta)
 
 	enemyMelee_1->setPosition(ccp(playerX, playerY));
 	_map->addChild(enemyMelee_1, 1);
-	enemySoldier.pushBack(enemyMelee_1);
+	enemyBoss.pushBack(enemyMelee_1);
 	allEnemy.pushBack(enemyMelee_1);
 }
 
@@ -256,7 +257,7 @@ void GameScene::initFighter()
 //是
 
 	//生成角色对应的武器
-	auto weapon = Pistol::create(EAttackMode::REMOTE,"Pistol",7,0.2,500,1);
+	auto weapon = Pistol::create(EAttackMode::REMOTE,"Pistol",7,0.2,500,3);
 	weapon->setPosition(_myFighter->getPosition());
 	this->getMap()->addChild(weapon);
 	allWeapon.pushBack(weapon);
@@ -278,24 +279,80 @@ void GameScene::initListener()
 }
 void GameScene::initComp()
 {
-	auto frame = Sprite::create("ArtDesigning/Word&Others/Comonent/CompBackground.png");
-	frame->setPosition(_myFighter->getPosition().x, _myFighter->getPosition().y + 50);
+	auto frame = Sprite::create("ArtDesigning/Word&Others/others/CompBackground.png");
+	frame->setPosition(70,698);
+	frame->setScale(2);
 	this->addChild(frame);
-	auto blood = Sprite::create("ArtDesigning/Word&Others/Comonent/RedComp.png");
+
+	auto frame_1 = Sprite::create("ArtDesigning/Word&Others/others/CompBackground.png");
+	frame_1->setPosition(70, 658);
+	frame_1->setScale(2);
+	this->addChild(frame_1);
+
+	auto frame_2 = Sprite::create("ArtDesigning/Word&Others/others/CompBackground.png");
+	frame_2->setPosition(70, 618);
+	frame_2->setScale(2);
+	this->addChild(frame_2);
+
+	auto blood = Sprite::create("ArtDesigning/Word&Others/others/RedComp.png");
 	ProgressTimer* comp = ProgressTimer::create(blood);
 	comp->setType(ProgressTimer::Type::BAR);
-	comp->setPosition(_myFighter->getPosition().x,_myFighter->getPosition().y+50);
+	comp->setPosition(70,698);
 	comp->setMidpoint(Vec2(0, 0.5));
-	comp->setTag(FRIENDLY);
+	comp->setScale(2);
+	comp->setTag(100886);
 	comp->setBarChangeRate(Vec2(1, 0));
-	this->addChild(comp);
+	this->addChild(comp,5);
+
+	auto mana = Sprite::create("ArtDesigning/Word&Others/others/ManaComp.png");
+	ProgressTimer* comp_1 = ProgressTimer::create(mana);
+	comp_1->setType(ProgressTimer::Type::BAR);
+	comp_1->setPosition(70, 658);
+	comp_1->setMidpoint(Vec2(0, 0.5));
+	comp_1->setScale(2);
+	comp_1->setTag(100887);
+	comp_1->setBarChangeRate(Vec2(1, 0));
+	this->addChild(comp_1,5);
+
+	auto theShield = Sprite::create("ArtDesigning/Word&Others/others/ShieldComp.png");
+	ProgressTimer* comp_2 = ProgressTimer::create(theShield);
+	comp_2->setType(ProgressTimer::Type::BAR);
+	comp_2->setPosition(70, 618);
+	comp_2->setMidpoint(Vec2(0, 0.5));
+	comp_2->setScale(2);
+	comp_2->setTag(100888);
+	comp_2->setBarChangeRate(Vec2(1, 0));
+	this->addChild(comp_2,5);
 }
 void GameScene::updateComp()
 {
-	auto myComp = (ProgressTimer*)this->getChildByTag(FRIENDLY);
-	myComp->setPercentage((((float)_myFighter->getCurHitPoints()) / _myFighter->getHitpoints()) * 100);
+	auto myComp_HP = (ProgressTimer*)(this->getChildByTag(100886));
+	myComp_HP->setPercentage((((float)_myFighter->getCurHitPoints()) / _myFighter->getHitpoints()) * 100);
 
+	auto myComp_MP = (ProgressTimer*)(this->getChildByTag(100887));
+	myComp_MP->setPercentage((((float)_myFighter->getCurManaPoints()) / _myFighter->getManaPoints()) * 100);
+
+	auto myComp_SP = (ProgressTimer*)(this->getChildByTag(100888));
+	myComp_SP->setPercentage((((float)_myFighter->getCurShield()) / _myFighter->getShield()) * 100);
+
+
+	for (auto& i : allComp)
+	{
+		if(i->getOwner()!=nullptr)
+				i->updateState();
+	}
 }
+
+void GameScene::generateComp()
+{
+	for (auto& i : allEnemy)
+	{
+		auto temp = Comp::create(i);
+		allComp.pushBack(temp);
+	}
+}
+
+
 //加载动画（一个旋涡状）
 void GameScene::loadingAnimation()
 {
@@ -510,7 +567,7 @@ void GameScene::updateEnemyPosition()
 			i->enemyMove();
 		}
 	}
-	for (auto& i : enemySoldier)
+	for (auto& i : allEnemy)
 	{
 		if (i->getPosition() == i->getDestination())
 		{
@@ -680,6 +737,18 @@ void GameScene::clearObject()
 			++it;
 	}
 
+	for (auto i = allComp.begin(); i != allComp.end();)
+	{
+		if ((*i)->getOwner() == nullptr || (*i)->getOwner()->getAlreadyDead())
+		{
+			(*i)->setVisible(false);
+			this->getMap()->removeChild(*i);
+			i = allComp.erase(i);
+		}
+		else
+			++i;
+	}
+
 	for (auto it = allEnemy.begin(); it != allEnemy.end();)
 	{
 		if ((*it)->getAlreadyDead())
@@ -710,6 +779,7 @@ void GameScene::clearObject()
 		else
 			++it;
 	}
+
 }
 
 //帧更新??我看不出来在哪里调用了该函数，但是确实调用了
@@ -717,9 +787,9 @@ void GameScene::update(float delta)
 {
 	updateFighterPosition();
 	updateFlyingItem();
+	updateComp();
 	updateSpecialBullet();
 	updateEnemyPosition();
-	updateComp();
 	updateNPC();
 	clearObject();
 }

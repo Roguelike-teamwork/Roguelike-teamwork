@@ -34,6 +34,7 @@ bool Goblin::initData(GameScene* Scene, std::string Name)
 	enemyName = Name;
 	camp = AllCamp::ENEMY;
 	level = SOLDIER;
+	attackMode = REMOTE;
 
 
 

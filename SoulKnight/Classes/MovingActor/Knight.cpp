@@ -37,6 +37,7 @@ bool Knight::init(GameScene* Scene, std::string Name)
 	manaPoints = KNIGHT_MP;
 	curManaPoints = manaPoints;
 	shield = KNIGHT_SHIELD;
+	curShield = shield;
 	identityRadius = KNIGHT_IDR;
 
 	fighterName = Name;
@@ -96,80 +97,86 @@ bool Knight::attack()
 	else
 		fireTimes = 1;
 		
-	if (attackTarget)
+	if (curManaPoints >= currentWeapon->getManaConsume())
 	{
-		if (currentWeapon->getEquipType() == REMOTE)
+		if (attackTarget)
 		{
-			for (int i = 0; i < fireTimes; i++)
+			if (currentWeapon->getEquipType() == REMOTE)
 			{
-				auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet.png", currentWeapon->getWeaponName().getCString())->getCString(),
-					currentWeapon->getAttackNumber(),
-					currentWeapon->getFlySpeed(),
-					this,
-					attackTarget);
-				bulletSprite->giveOut();
-				bulletSprite->setScale(0.75f, 0.75f);
+				for (int i = 0; i < fireTimes; i++)
+				{
+					auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet.png", currentWeapon->getWeaponName().getCString())->getCString(),
+						currentWeapon->getAttackNumber(),
+						currentWeapon->getFlySpeed(),
+						this,
+						attackTarget);
+					bulletSprite->giveOut();
+					bulletSprite->setScale(0.75f, 0.75f);
 
-				if (isRelease)
-					bulletSprite->setPosition(Vec2(this->getPosition().x + (2 * i - 1) * 5 * sin(bulletSprite->getAngle() / 180 * M_PI),
-						this->getPosition().y + (1 - 2 * i) * 5 * cos(bulletSprite->getAngle() / 180 * M_PI)));
+					if (isRelease)
+						bulletSprite->setPosition(Vec2(this->getPosition().x + (2 * i - 1) * 5 * sin(bulletSprite->getAngle() / 180 * M_PI),
+							this->getPosition().y + (1 - 2 * i) * 5 * cos(bulletSprite->getAngle() / 180 * M_PI)));
 
-				bulletSprite->setAttackMode(REMOTE);
-				exploreScene->getMap()->addChild(bulletSprite);
-				exploreScene->flyingItem.pushBack(bulletSprite);
+					bulletSprite->setAttackMode(REMOTE);
+					exploreScene->getMap()->addChild(bulletSprite);
+					exploreScene->flyingItem.pushBack(bulletSprite);
+					curManaPoints -= currentWeapon->getManaConsume();
+				}
 			}
+			else
+			{
+				auto it = dynamic_cast<Fork*>(currentWeapon);
+				for (int i = 0; i < 1; i++)
+				{
+					it->cut();
+					curManaPoints -= currentWeapon->getManaConsume();
+				}
+			}
+			lastAttackTime = GetCurrentTime() / 1000.f;
+			return true;
 		}
-		else
+		else if (!attackTarget)
 		{
-			auto it = dynamic_cast<Fork*>(currentWeapon);
-			for (int i = 0; i < 1; i++)
+			if (currentWeapon->getEquipType() == REMOTE)
 			{
-				it->cut();
+				for (int i = 0; i < fireTimes; i++)
+				{
+					auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet.png", currentWeapon->getWeaponName().getCString())->getCString(),
+						currentWeapon->getAttackNumber(),
+						currentWeapon->getFlySpeed(),
+						this,
+						attackTarget);
+
+
+					if (!isMoving)
+						bulletSprite->giveOut(ldirection);
+					else
+						bulletSprite->giveOut(direction);
+
+					if (isRelease)
+						bulletSprite->setPosition(Vec2(this->getPosition().x + (2 * i - 1) * 5 * sin(bulletSprite->getAngle() / 180 * M_PI),
+							this->getPosition().y + (1 - 2 * i) * 5 * cos(bulletSprite->getAngle() / 180 * M_PI)));
+
+					bulletSprite->setScale(0.75f, 0.75f);
+					bulletSprite->setAttackMode(REMOTE);
+					exploreScene->getMap()->addChild(bulletSprite);
+					exploreScene->flyingItem.pushBack(bulletSprite);
+					curManaPoints -= currentWeapon->getManaConsume();
+				}
 			}
+			else
+			{
+				auto it = dynamic_cast<Fork*>(currentWeapon);
+				for (int i = 0; i < 1; i++)
+				{
+					it->cut();
+					curManaPoints -= currentWeapon->getManaConsume();
+				}
+			}
+			lastAttackTime = GetCurrentTime() / 1000.f;
+			return true;
 		}
-		lastAttackTime = GetCurrentTime()/1000.f;
-		return true;
 	}
-	else if (!attackTarget)
-	{
-		if (currentWeapon->getEquipType() == REMOTE)
-		{
-			for (int i = 0; i < fireTimes; i++)
-			{
-				auto bulletSprite = Bullet::create(CCString::createWithFormat("ArtDesigning/FlyingItem/Bullet/%sBullet.png", currentWeapon->getWeaponName().getCString())->getCString(),
-					currentWeapon->getAttackNumber(),
-					currentWeapon->getFlySpeed(),
-					this,
-					attackTarget);
-
-
-				if (!isMoving)
-					bulletSprite->giveOut(ldirection);
-				else
-					bulletSprite->giveOut(direction);
-
-				if (isRelease)
-					bulletSprite->setPosition(Vec2(this->getPosition().x + (2 * i - 1) * 5 * sin(bulletSprite->getAngle() / 180 * M_PI),
-						this->getPosition().y + (1 - 2 * i) * 5 * cos(bulletSprite->getAngle() / 180 * M_PI)));
-
-				bulletSprite->setScale(0.75f, 0.75f);
-				bulletSprite->setAttackMode(REMOTE);
-				exploreScene->getMap()->addChild(bulletSprite);
-				exploreScene->flyingItem.pushBack(bulletSprite);
-			}
-		}
-		else
-		{
-			auto it = dynamic_cast<Fork*>(currentWeapon);
-			for (int i = 0; i < 1; i++)
-			{
-				it->cut();
-			}
-		}
-		lastAttackTime = GetCurrentTime()/1000.f;
-		return true;
-	}
-
 	return false;
 }
 

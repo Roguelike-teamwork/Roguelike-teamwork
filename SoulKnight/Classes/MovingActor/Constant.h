@@ -11,7 +11,7 @@
 #define INIT_ID_RADIUS 300        //移动角色的感应半径，探知范围内是否有其他移动物体  
 
 #define	KNIGHT_HP 100
-#define KNIGHT_MP 200
+#define KNIGHT_MP 400
 #define KNIGHT_SHIELD 50
 #define KNIGHT_MOVESPEED 4
 #define KNIGHT_IDR 250
@@ -21,25 +21,26 @@
 #define GOBLIN_HP 50
 #define GOBLIN_DAMAGE 5
 #define GOBLIN_FLYSPEED 10
-#define GOBLIN_MOVESPEED 2
+#define GOBLIN_MOVESPEED 30
 #define GOBLIN_IDR 350
 #define GOBLIN_ATTACKR 275
 #define GOBLIN_ATTACKSPEED 1
 
 #define PIG_HP 200
-#define PIG_DAMAGE 10
-#define PIG_MOVESPEED 6
+#define PIG_DAMAGE 30
+#define PIG_MOVESPEED 80
 #define PIG_IDR 400
 #define PIG_ATTACKR 50
 #define PIG_ATTACKSPEED 2
 
 #define DRAGON_HP 1500
 #define DRAGON_DAMAGE 4
-#define DRAGON_MOVESPEED 3
+#define DRAGON_MOVESPEED 60
+#define DRAGON_FLYSPEED 7
 
 #define PISTOL_DAMAGE 7
 #define PISTOL_ATTACKSPEED 0.7
-#define PISTOL_FLYSPEED 12
+#define PISTOL_FLYSPEED 16
 #define PISTOL_MPCONSUME 5
 
 #define FORK_DAMAGE 4

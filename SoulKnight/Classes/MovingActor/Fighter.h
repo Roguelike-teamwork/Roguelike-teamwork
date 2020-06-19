@@ -50,6 +50,8 @@ public:
 	
 	Vector<Buff*> myBuff;
 
+	virtual bool isFullShield();
+
 	virtual void loadAnimation();
 
 	virtual bool isFullEquipments();               //ÅĞ¶ÏÊÇ·ñ´øÂúÎäÆ÷

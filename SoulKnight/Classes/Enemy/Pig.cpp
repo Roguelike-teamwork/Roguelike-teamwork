@@ -34,6 +34,7 @@ bool Pig::initData(GameScene* Scene, std::string Name)
 	enemyName = Name;
 	camp = AllCamp::ENEMY;
 	level = SOLDIER;
+	attackMode = MELEE;
 
 	attackSpeed = PIG_ATTACKSPEED;
 	hitPoints = PIG_HP;
@@ -98,7 +99,7 @@ bool Pig::attack()
 			}
 		}
 		auto damage = Bullet::create("ArtDesigning/FlyingItem/Bullet/PigEffect.png",
-			4,
+			damageAbility,
 			0,
 			this,
 			NULL);

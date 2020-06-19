@@ -6,6 +6,7 @@
 #include "MovingActor/MovingActor.h"
 #include "MovingActor/Bullet.h"
 #include "MovingActor/UnMovingActor.h"
+#include "Comp/Comp.h"
 #include "Controller/MoveCtrl.h"
 #include <vector>
 
@@ -47,6 +48,7 @@ class GameScene : public cocos2d::Scene
 private:
 	//≥ı ºªØ
 	void generateEnemies(float delta);
+	void generateComp();
 	void initMapLayer();
 	void initFighter();
 	void initListener();
@@ -97,6 +99,7 @@ public:
 	Vector<Bullet*> flyingItem;
 	Vector<Bullet*> specialBullet;
 	Vector<UnMovingActor*> allNpc;
+	Vector<Comp*> allComp;
 
 
 	static cocos2d::Scene* createScene();
