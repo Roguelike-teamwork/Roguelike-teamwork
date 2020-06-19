@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Enemy/Dragon.h"
 #include"Enemy/Goblin.h"
+#include"Enemy/Pig.h"
 #include"MovingActor/Knight.h"
 #include"MovingActor/EnemyMelee.h"
 #include"Weapon/Pistol.h"
@@ -34,10 +35,11 @@ bool GameScene::init()
 	_gameBegin = true;
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
-	loadingAnimation();
+
 	initMapLayer();
 
 	initFighter();
+	loadingAnimation();
 	initComp();
 	initListener();
 	initNextScene();
@@ -209,7 +211,7 @@ CCPoint GameScene::tileCoordForPosition(CCPoint pos)
 //生成敌人
 void GameScene::generateEnemies(float delta)
 {
-	Enemy * enemyMelee_1 = Dragon::create(this, "Dragon");
+	Enemy * enemyMelee_1 = Pig::create(this, "Pig");
 
 	//加载对象层
 	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
@@ -220,7 +222,7 @@ void GameScene::generateEnemies(float delta)
 
 	enemyMelee_1->setPosition(ccp(playerX, playerY));
 	_map->addChild(enemyMelee_1, 1);
-	enemyBoss.pushBack(enemyMelee_1);
+	enemySoldier.pushBack(enemyMelee_1);
 	allEnemy.pushBack(enemyMelee_1);
 }
 
@@ -297,6 +299,81 @@ void GameScene::updateComp()
 //加载动画（一个旋涡状）
 void GameScene::loadingAnimation()
 {
+	//上方向动画
+	auto temp_1 = Animation::create();
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sUp_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_1->addSpriteFrameWithFileName(frameName->getCString());
+	}
+	AnimationCache::getInstance()->addAnimation(temp_1,String::createWithFormat("%sUp",_myFighter->getFighterName().getCString())->getCString());
+
+	auto temp_2 = Animation::create();
+	//左上
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sUpLeft_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_2->addSpriteFrameWithFileName(frameName->getCString());
+
+	}
+	AnimationCache::getInstance()->addAnimation(temp_2, String::createWithFormat("%sUpLeft", _myFighter->getFighterName().getCString())->getCString());
+
+	auto temp_3 = Animation::create();
+	//右上
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sUpRight_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_3->addSpriteFrameWithFileName(frameName->getCString());
+	}
+	AnimationCache::getInstance()->addAnimation(temp_3, String::createWithFormat("%sUpRight", _myFighter->getFighterName().getCString())->getCString());
+
+	auto temp_4 = Animation::create();
+	//右
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sRight_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_4->addSpriteFrameWithFileName(frameName->getCString());
+	}
+	AnimationCache::getInstance()->addAnimation(temp_4, String::createWithFormat("%sRight", _myFighter->getFighterName().getCString())->getCString());
+
+
+	auto temp_5 = Animation::create();
+	//右下
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sDownRight_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_5->addSpriteFrameWithFileName(frameName->getCString());
+	}
+	AnimationCache::getInstance()->addAnimation(temp_5, String::createWithFormat("%sDownRight", _myFighter->getFighterName().getCString())->getCString());
+
+
+	auto temp_6 = Animation::create();
+	//下
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_6->addSpriteFrameWithFileName(frameName->getCString());
+	}
+	AnimationCache::getInstance()->addAnimation(temp_6, String::createWithFormat("%sDown", _myFighter->getFighterName().getCString())->getCString());
+
+
+	auto temp_7 = Animation::create();
+	//左下
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sDownLeft_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_7->addSpriteFrameWithFileName(frameName->getCString());
+	}
+	AnimationCache::getInstance()->addAnimation(temp_7, String::createWithFormat("%sDownLeft", _myFighter->getFighterName().getCString())->getCString());
+
+	auto temp_8 = Animation::create();
+	//左
+	for (int i = 1; i <= 2; i++)
+	{
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Fighter/%sLeft_%d.png", _myFighter->getFighterName().getCString(), i);
+		temp_8->addSpriteFrameWithFileName(frameName->getCString());
+	}
+	AnimationCache::getInstance()->addAnimation(temp_8, String::createWithFormat("%sLeft", _myFighter->getFighterName().getCString())->getCString());
 
 }
 
@@ -304,20 +381,17 @@ void GameScene::loadingAnimation()
 void GameScene::updateFighterPosition()
 {
 	auto nowTime = GetCurrentTime() / 1000.f;
-
-
 	if (_myFighter->getAlreadyDead())
 		return;
 
 	auto it = dynamic_cast<Knight*>(_myFighter);
 	it->updateSkill();
-
 	if (it->getCanAttack())
 		it->attack();
 	
 	_myFighter->updateCondition();
+	_myFighter->setOldDirection(_myFighter->getDirection());
 	_myFighter->setIsMoving(_rocker->getIsCanMove());
-	_myFighter->setFDirection(_rocker->getFirstDirection());
 	_myFighter->setDirection(_rocker->getDirection());
 	_myFighter->setLDriection(_rocker->getLastDirection());
 	
@@ -335,10 +409,9 @@ void GameScene::updateFighterPosition()
 		std::string collision = propValueMap["collidable"].asString();
 
 		if (collision == "true")
-		{
 			return;
-		}
 	}
+
 	if (collisionForFightBool)
 	{
 		tileGid = _collisionForFight->tileGIDAt(tiledpos);
@@ -350,11 +423,10 @@ void GameScene::updateFighterPosition()
 			std::string collision = propValueMap["collidable"].asString();
 
 			if (collision == "true")
-			{
 				return;
-			}
 		}
 	}
+
 	tileGid = _fenceBool->tileGIDAt(tiledpos);
 	if (tileGid > 0)
 	{
@@ -374,8 +446,14 @@ void GameScene::updateFighterPosition()
 
 	
 
-	if(_myFighter->getIsMoving())
+	if (_myFighter->getIsMoving())
+	{
 		_myFighter->fighterMove(newPosition);
+		if (_myFighter->getOldDirection()!=_myFighter->getDirection())
+		{
+			_myFighter->playAnimation();
+		}
+	}
 	else
 		_myFighter->stand();
 }
@@ -644,41 +722,6 @@ void GameScene::update(float delta)
 	updateComp();
 	updateNPC();
 	clearObject();
-
-
-	/*子弹击中判断
-	for (auto it = _bullets.begin(); it != _bullets.end();)
-	{
-		if (!(*it)->getTarget()->getAlreadyDead())
-		{
-			if ((*it)->calculateDistance() < (*it)->getTarget()->getBoundingBox().size.height / 2)
-			{
-				auto target = (*it)->getTarget();
-				target->takeDamage((*it)->getDamage(), (*it)->getFromActor());
-				removeChild(*it);
-				it = _bullets.erase(it);
-			}
-			else
-			{
-				(*it)->calculatePosition();
-				++it;
-			}
-		}
-		else
-		{
-			removeChild(*it);
-			it = _bullets.erase(it);
-		}
-	}*/
-
-	/*敌人死亡判断
-	for (auto it = _enemies.begin(); it != _enemies.end(); ++it)
-	{
-		if ((*it)->getAlreadyDead())
-		{
-			(*it)->setVisible(false);
-		}
-	}*/
 }
 
 void GameScene::updateWeapon()

@@ -17,15 +17,12 @@ class Enemy :public MovingActor
 	CC_SYNTHESIZE(float, attackRadius, AttackRadius);
 	CC_SYNTHESIZE(EnemyLevel, level, Level);
 	CC_SYNTHESIZE(MovingActor*, fromFighter, FromFighter);
-	CC_SYNTHESIZE(EDirection, fDirecition, FDirection);
-
 	CCSprite* m_sprite;
 public:
 	static Enemy* create(GameScene* Scene, std::string fighterName);
 	bool init(GameScene* Scene, std::string fighterName);
 	bool initData(GameScene* Scene, std::string fighterName);
 	bool attack();
-
 	void bindSprite(CCSprite* sprite);
 	void updateAction();
 	void updateDestination();

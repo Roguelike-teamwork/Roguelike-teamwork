@@ -1,19 +1,53 @@
 #pragma once
 #ifndef __CONSTANT_H_
 #define __CONSTANT_H_
-
 #include"cocos2d.h"
 
 #define INIT_HITPOINTS 5			//初始化生命值
 #define INIT_SHIELD 5				//初始化护盾值
 #define INIT_MANAPOINTS 180			//初始化法力值
-
+#define COMMON_ATTACKSPEED 1.0f
 #define SHIELD_RECOVER_TIME 1.0f     //主角护盾击破后刷新时间初始化1.0f
-#define INIT_ID_RADIUS 500        //移动角色的感应半径，探知范围内是否有其他移动物体  
-#define MELEE_RADUIS 50    //无近武时的近战半径
-/* 
-*没有具体测量，暂时设置500  
-*/
+#define INIT_ID_RADIUS 300        //移动角色的感应半径，探知范围内是否有其他移动物体  
+
+#define	KNIGHT_HP 100
+#define KNIGHT_MP 200
+#define KNIGHT_SHIELD 50
+#define KNIGHT_MOVESPEED 4
+#define KNIGHT_IDR 250
+#define KNIGHT_SKILLTIME 5.0f
+#define KNIGHT_SKILLCD 10.0f
+
+#define GOBLIN_HP 50
+#define GOBLIN_DAMAGE 5
+#define GOBLIN_FLYSPEED 10
+#define GOBLIN_MOVESPEED 2
+#define GOBLIN_IDR 350
+#define GOBLIN_ATTACKR 275
+#define GOBLIN_ATTACKSPEED 1
+
+#define PIG_HP 200
+#define PIG_DAMAGE 10
+#define PIG_MOVESPEED 6
+#define PIG_IDR 400
+#define PIG_ATTACKR 50
+#define PIG_ATTACKSPEED 2
+
+#define DRAGON_HP 1500
+#define DRAGON_DAMAGE 4
+#define DRAGON_MOVESPEED 3
+
+#define PISTOL_DAMAGE 7
+#define PISTOL_ATTACKSPEED 0.7
+#define PISTOL_FLYSPEED 12
+#define PISTOL_MPCONSUME 5
+
+#define FORK_DAMAGE 4
+#define FORK_ATTACKSPEED 1.0
+#define FORK_MPCONSUME 2
+
+
+
 #define INIT_MOVESPEED 3.0
 #define INIT_EQUIP_NUMBER 2
 

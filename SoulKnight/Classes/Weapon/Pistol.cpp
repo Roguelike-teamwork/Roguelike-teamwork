@@ -33,33 +33,12 @@ bool Pistol::init(EAttackMode _equipType, String _weaponName, int _attack,
 	attackNumber = _attack;
 	attackSpeedNumber = _attackSpeed;
 	attackRadius = _attackRadius;
-	flySpeed = 12;
+	flySpeed = PISTOL_FLYSPEED;
 
 	manaConsume = _manaConsume;
 	nowState = GROUND;
 
 	this->setTexture("ArtDesigning/FlyingItem/Weapon/Pistol.png");
 	return true;
-}
-
-bool Pistol::init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname)
-{
-	if (!Sprite::init())
-	{
-		return false;
-	}
-
-
-	equipType = _equipType;
-	equipName = _equipname;
-
-	attackNumber = data.at(0).asInt();
-	attackSpeedNumber = data.at(1).asFloat();
-	attackRadius = data.at(2).asInt();
-	manaConsume = data.at(3).asInt();
-
-	
-	return true;
-
 }
 

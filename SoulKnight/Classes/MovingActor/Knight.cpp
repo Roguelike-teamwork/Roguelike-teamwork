@@ -29,11 +29,17 @@ bool Knight::init(GameScene* Scene, std::string Name)
 		return false;
 	}
 	//待初始化数据
-	hitPoints = 1000;
+	hitPoints = KNIGHT_HP;
 	curHitPoints = hitPoints;
-	lastSkillTime = 5.0f;
-	skillCDTime = 10.0f;
-	moveSpeed = 4;
+	lastSkillTime =	KNIGHT_SKILLTIME;
+	skillCDTime = KNIGHT_SKILLCD;
+	moveSpeed = KNIGHT_MOVESPEED;
+	manaPoints = KNIGHT_MP;
+	curManaPoints = manaPoints;
+	shield = KNIGHT_SHIELD;
+	identityRadius = KNIGHT_IDR;
+
+	fighterName = Name;
 	//TBD
 
 	return true;

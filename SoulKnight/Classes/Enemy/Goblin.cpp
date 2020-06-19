@@ -33,23 +33,22 @@ bool Goblin::initData(GameScene* Scene, std::string Name)
 	exploreScene = Scene;
 	enemyName = Name;
 	camp = AllCamp::ENEMY;
+	level = SOLDIER;
 
-	setTexture("ArtDesigning/Sprite/Enemy/Goblin/Goblin1.png");
 
 
-	attackSpeed = 2.0f;
-	hitPoints = 50;
+	attackSpeed = GOBLIN_ATTACKSPEED;
+	hitPoints = GOBLIN_HP;
 	curHitPoints = hitPoints;    //数据具体化，不动用plist
-
-	damageAbility = 1;
-	moveSpeed = 100;
-	identityRadius = 250;
-	attackRadius = 200;
+	damageAbility = GOBLIN_DAMAGE;
+	moveSpeed = GOBLIN_MOVESPEED;
+	identityRadius = GOBLIN_IDR;
+	attackRadius = GOBLIN_ATTACKR;
 
 	alreadyDead = false;
 	everAttack = false;
-	level = SOLDIER;
 
+	setTexture("ArtDesigning/Sprite/Enemy/Goblin/Goblin1.png");
 	loadAnimation();
 	this->runAction(normal);
 
@@ -58,7 +57,6 @@ bool Goblin::initData(GameScene* Scene, std::string Name)
 
 bool Goblin::loadAnimation()
 {
-	//cocos2d::Vector<SpriteFrame*> normalFrames;
 	Animation* normalAnimation = Animation::create();
 	for (int i = 1; i <= 2; i++)
 	{

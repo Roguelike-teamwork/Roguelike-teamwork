@@ -14,25 +14,22 @@ USING_NS_CC;
 
 class Fighter :public MovingActor
 {
-	CC_SYNTHESIZE(EAttackMode, attackMode, AttackMode);//设置攻击模式的切换 近战/远程
 	CC_SYNTHESIZE(EDirection, direction, Direction);//人物的移动方向
-	CC_SYNTHESIZE(EDirection, fdirection, FDirection);//人物的面向
+	CC_SYNTHESIZE(EDirection, olddirection, OldDirection);//人物的面向  之后可以删掉了
 	CC_SYNTHESIZE(EDirection, ldirection, LDriection);//
 	CC_SYNTHESIZE(bool, isMoving, IsMoving);
 	CC_SYNTHESIZE(bool, canAttack, CanAttack);
-
+	CC_SYNTHESIZE(bool, isPlay, IsPlay);
+	CC_SYNTHESIZE(bool, canBeHurt, CanBeHurt);
 
 	CC_SYNTHESIZE(int, shield, Shield);                //护甲值上限
 	CC_SYNTHESIZE(int, curShield, CurShield);		   //当前护甲值
 	CC_SYNTHESIZE(float, acRcoverSpeed, ACRcoverSpeed); //护甲刷新时间
 	CC_SYNTHESIZE(float, lastTimeInjured, LastTimeInjured); //最后受到伤害的时间，用于刷新护盾
 	CC_SYNTHESIZE(float, lastTimeRecover, LastTimeRecover);
-	CC_SYNTHESIZE(bool, canBeHurt, CanBeHurt);
 
 	CC_SYNTHESIZE(int, manaPoints, ManaPoints);			//法力值上限
 	CC_SYNTHESIZE(int, curManaPoints, CurManaPoints);	//当前法力值
-
-	CC_SYNTHESIZE(float, critRate, CritRate);              //暴击率
 
 	CC_SYNTHESIZE(String, fighterName, FighterName);	//获取角色名
 	CC_SYNTHESIZE(int, equipNumber, EquipNumber);     //所能携带的武器数量
@@ -45,7 +42,6 @@ class Fighter :public MovingActor
 	CC_SYNTHESIZE(float, skillCDTime, SkillCDTime);			//技能冷却时间
 	CC_SYNTHESIZE(EBuffType, state, State);
 
-	CC_SYNTHESIZE(Action*,twink,Twink);
 	
 	CCSprite* m_sprite;
 public:
@@ -53,6 +49,8 @@ public:
 	Vector<Equipment*> myWeapon;
 	
 	Vector<Buff*> myBuff;
+
+	virtual void loadAnimation();
 
 	virtual bool isFullEquipments();               //判断是否带满武器
 
@@ -80,7 +78,7 @@ public:
 
 	static Fighter* create(GameScene* Scene, std::string fighterName);   //Unknown
 
-	virtual void playAttackAnimation();   //？？？ Unknown
+	virtual void playAnimation();   //？？？ Unknown
 
 	virtual bool isZeroSheild();           //判定护甲值是否为0
 	

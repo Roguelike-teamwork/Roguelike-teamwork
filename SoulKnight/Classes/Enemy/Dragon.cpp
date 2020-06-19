@@ -4,6 +4,7 @@
 #include"MovingActor/Bullet.h"
 #include"MovingActor/Buff.h"
 #include"Scene/GameScene.h"
+#include"MovingActor/Constant.h"
 #include<vector>
 
 Dragon* Dragon::create(GameScene* Scene, std::string Name)
@@ -33,29 +34,24 @@ bool Dragon::initData(GameScene* Scene, std::string Name)
 	exploreScene = Scene;
 	enemyName = Name;
 	camp = AllCamp::ENEMY;
+	level = EnemyLevel::BOSS;
 
-	setTexture("ArtDesigning/Sprite/Enemy/Dragon/dragon1.png");
-
-	hitPoints = 1500;
+	hitPoints = DRAGON_HP;
+	attackSpeed = COMMON_ATTACKSPEED;
+	curHitPoints = hitPoints;
+	attackRadius = INIT_ID_RADIUS;
+	damageAbility = DRAGON_DAMAGE;
+	moveSpeed = DRAGON_MOVESPEED;
+	identityRadius = INIT_ID_RADIUS;
 
 	alreadyDead = false;
 	everAttack = false;
-	attackSpeed = 1.0f;
-	level = EnemyLevel::BOSS;
-
-	curHitPoints = hitPoints;
-	attackRadius = 500;
-
-	damageAbility = 1;
-	moveSpeed = 100;
-	identityRadius = 250;
-	attackRadius = 200;
-
 	isReleaseSkill_1 = false;
 	isReleaseSkill_2 = false;
 	isReleaseSkill_3 = false;
 	lastSkill = NOTHING;
 
+	setTexture("ArtDesigning/Sprite/Enemy/Dragon/dragon1.png");
 	loadAnimation();
 	this->runAction(normal);
 

@@ -37,7 +37,6 @@ bool Fighter::init(GameScene* Scene, std::string fighterName)
 
 	initHeroData( Scene, fighterName);
 	//其他初始定义待补充
-
 	return true;
 
 }
@@ -57,25 +56,24 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 	equipNumber = INIT_EQUIP_NUMBER;
 
 	canBeHurt = true;
+	isPlay = false;
 	alreadyDead = false;
 	attackSpeed = 0.f;
-	attackMode = MIX;
 	attackTarget = NULL;
 	lastTimeInjured = 0.f;
 	isMoving = false;
 	//lastSkillTime = 0.f;
-	setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown.png", fighterName.getCString())->getCString());
-
-
+	setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown_1.png", fighterName.getCString())->getCString());
+	setScale(0.625);
 	curHitPoints = hitPoints;         //初始设定为满值
 	curShield = shield;		
 	curManaPoints = manaPoints;
 			
-
-
-
-
 	return true;
+}
+
+void Fighter::loadAnimation()
+{
 }
 
 bool Fighter::isFullEquipments()
@@ -169,7 +167,6 @@ void Fighter::hurt(INT32 damage)
 	{
 		curHitPoints -= currentDamage;
 		canBeHurt = false;
-		this->runAction(CCBlink::create(2.0f,10));
 	}
 		currentDamage = 0;
 
@@ -180,7 +177,7 @@ void Fighter::hurt(INT32 damage)
 void Fighter::updateCondition()
 {
 	auto nowTime = GetCurrentTime()/1000.f;
-
+	setVisible(true);
 	if (isZeroSheild())
 	{
 		if (nowTime - lastTimeInjured > 3.0f)
@@ -194,10 +191,14 @@ void Fighter::updateCondition()
 	}
 	if (!canBeHurt)
 	{
-		if (nowTime - lastTimeInjured > 2.0f)
+		if (!isPlay)
+		{
+			runAction(Blink::create(2.0f,250));
+			isPlay = true;
+		}
+		if (nowTime - lastTimeInjured >= 2.0f)
 		{
 			canBeHurt = true;
-			runAction(Show::create());
 		}
 	}
 }
@@ -222,7 +223,7 @@ Vec2 Fighter::updateDestination()       //
 		current.x -= moveSpeed;
 		break;
 	case EDirection::DOWN:
-		current.y -= moveSpeed;
+		current.y -= moveSpeed;	
 		break;
 	case EDirection::DOWNLEFT:
 		current.x -= moveSpeed;
@@ -240,23 +241,53 @@ Vec2 Fighter::updateDestination()       //
 	default:
 		break;
 	}
-	switch (fdirection)
+	return current;
+}
+
+void Fighter::playAnimation()
+{
+	//动画播放采用前辈王者荣耀中的实例
+	stopAllActions();
+	if(direction!=NODIR)
+		isPlay = false;
+	auto animation = Animation::create();
+	switch (direction)
 	{
-	case EDirection::UP:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sUp.png", fighterName.getCString())->getCString());
+	case EDirection::UP:	
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sUp",fighterName.getCString())->getCString());
+		break;
+	case EDirection::UPLEFT:
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sUpLeft", fighterName.getCString())->getCString());
+		break;
+	case EDirection::UPRIGHT:	
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sUpRight", fighterName.getCString())->getCString());
+		break;
+	case EDirection::LEFT:	
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sLeft", fighterName.getCString())->getCString());
 		break;
 	case EDirection::DOWN:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown.png", fighterName.getCString())->getCString());
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sDown", fighterName.getCString())->getCString());
 		break;
-	case EDirection::LEFT:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sLeft.png", fighterName.getCString())->getCString());
+	case EDirection::DOWNLEFT:
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sDownLeft", fighterName.getCString())->getCString());
+		break;
+	case EDirection::DOWNRIGHT:
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sDownRight", fighterName.getCString())->getCString());
 		break;
 	case EDirection::RIGHT:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sRight.png", fighterName.getCString())->getCString());
+		animation = AnimationCache::getInstance()->getAnimation(String::createWithFormat("%sRight", fighterName.getCString())->getCString());
 		break;
-	}
+	case EDirection::NODIR:
+		break;
+	default:
+		break;
+	}	
 
-	return current;
+	animation->setDelayPerUnit(1.f / (moveSpeed*2));
+	animation->setLoops(-1);
+
+	auto animate = Animate::create(animation);
+	runAction(RepeatForever::create(animate));
 }
 
 void Fighter::fighterMove(Vec2 newPosition)
@@ -266,20 +297,39 @@ void Fighter::fighterMove(Vec2 newPosition)
 
 void Fighter::stand()
 {
+	stopAllActions();
+	if(direction!=NODIR)
+		isPlay = false;
 	isMoving = false;
-	switch (fdirection)
+	switch (direction)
 	{
 	case EDirection::UP:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sUp.png",fighterName.getCString())->getCString());
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sUp_1", fighterName.getCString())->getCString());
 		break;
-	case EDirection::DOWN:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown.png", fighterName.getCString())->getCString());
+	case EDirection::UPLEFT:
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sUpLeft_1", fighterName.getCString())->getCString());
+		break;
+	case EDirection::UPRIGHT:
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sUpRight_1", fighterName.getCString())->getCString());
 		break;
 	case EDirection::LEFT:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sLeft.png", fighterName.getCString())->getCString());
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sLeft_1", fighterName.getCString())->getCString());
+		break;
+	case EDirection::DOWN:
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sDown_1", fighterName.getCString())->getCString());
+		break;
+	case EDirection::DOWNLEFT:
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sDownLeft_1", fighterName.getCString())->getCString());
+		break;
+	case EDirection::DOWNRIGHT:
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sDownRight_1", fighterName.getCString())->getCString());
 		break;
 	case EDirection::RIGHT:
-		setTexture(CCString::createWithFormat("ArtDesigning/Sprite/Fighter/%sRight.png", fighterName.getCString())->getCString());
+		setTexture(String::createWithFormat("ArtDesigning/Sprite/Fighter/%sRight_1", fighterName.getCString())->getCString());
+		break;
+	case EDirection::NODIR:
+		break;
+	default:
 		break;
 	}
 	direction = EDirection::NODIR;
@@ -323,11 +373,6 @@ void Fighter::updateTarget()
 	attackTarget = tempTarget;
 }
 
-
-void Fighter::playAttackAnimation()
-{
-	//
-}
 
 
 bool Fighter::isZeroSheild()

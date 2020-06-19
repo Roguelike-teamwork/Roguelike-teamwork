@@ -12,15 +12,11 @@ class GameScene;
 
 class MovingActor :public cocos2d::Sprite
 {
-	CC_SYNTHESIZE(int, maxHitPoints, MaxHitpoints);   //生命值上限
 	CC_SYNTHESIZE(int,curHitPoints,CurHitPoints) //当前生命值
-
 	CC_SYNTHESIZE(AllCamp, camp, Camp);//阵营
 	CC_SYNTHESIZE(INT32, hitPoints, Hitpoints);   //生命值
-
 	CC_SYNTHESIZE(INT32, damageAbility, DamageAbility);   //造成伤害
 
-	//以下两个量可能会因为武器的加入而变得很没用
 	CC_SYNTHESIZE(float, flySpeed, FlySpeed);
 	CC_SYNTHESIZE(float, attackSpeed, AttackSpeed); //攻击速度/攻击频次
 	
@@ -32,7 +28,6 @@ class MovingActor :public cocos2d::Sprite
 	CC_SYNTHESIZE(GameScene*, exploreScene, ExploreScene);   //加入场景
 	CC_SYNTHESIZE(MovingActor*,attackFrom, AttackFrom);//伤害来源
 	CC_SYNTHESIZE(MovingActor*, attackTarget, AttackTarget);//攻击目标
-	CC_SYNTHESIZE(cocos2d::CCSize, bodySize, BodySize);
 
 protected:
 

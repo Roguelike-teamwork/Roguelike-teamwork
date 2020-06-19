@@ -69,10 +69,6 @@ void Enemy::updateDestination()
 		tempX = random(-50, 50) ;//如果过大，将出界，因为界外没有瓦片,不对其进行碰撞检测，直接框在房间里
 		tempY = random(-50, 50) ;
 
-		if (tempY >= 0)
-			fDirecition = EDirection::RIGHT;
-		else
-			fDirecition = EDirection::LEFT;
 
 		tempDes.x = getPosition().x + tempX;
 		tempDes.y = getPosition().y + tempY;
