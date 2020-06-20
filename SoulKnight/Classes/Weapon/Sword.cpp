@@ -1,11 +1,11 @@
-#include"Fork.h"
+#include"Sword.h"
 #include"MovingActor/Bullet.h"
 #include"Scene/GameScene.h"
 
-Fork* Fork::create(EAttackMode _equipType, String _weaponName, int _attack,
+Sword* Sword::create(EAttackMode _equipType, String _weaponName, int _attack,
 	float _attackSpeed, int _attackRadius, int _manaConsume)
-{ 
-	Fork* equipment = new Fork();
+{
+	Sword* equipment = new Sword();
 	if (equipment && equipment->init(_equipType, _weaponName, _attack,
 		_attackSpeed, _attackRadius, _manaConsume))
 	{
@@ -20,7 +20,7 @@ Fork* Fork::create(EAttackMode _equipType, String _weaponName, int _attack,
 
 
 
-bool Fork::init(EAttackMode _equipType, String _weaponName, int _attack,
+bool Sword::init(EAttackMode _equipType, String _weaponName, int _attack,
 	float _attackSpeed, int _attackRadius, int _manaConsume)
 {
 	if (!Sprite::init())
@@ -30,19 +30,19 @@ bool Fork::init(EAttackMode _equipType, String _weaponName, int _attack,
 
 	equipType = _equipType;
 	weaponName = _weaponName;
-	equipName = FORK;
+	equipName = SWORD;
 	attackNumber = _attack;
 	attackSpeedNumber = _attackSpeed;
 	attackRadius = _attackRadius;
 
 	manaConsume = _manaConsume;
 
-	this->setTexture("ArtDesigning/FlyingItem/Weapon/Fork.png");
+	this->setTexture("ArtDesigning/FlyingItem/Weapon/Sword.png");
 
 	return true;
 }
 
-bool Fork::init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname)
+bool Sword::init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname)
 {
 	if (!Sprite::init())
 	{
@@ -64,7 +64,7 @@ bool Fork::init(ValueVector& data, EAttackMode _equipType, EEQUIPMENT _equipname
 
 }
 
-bool Fork::cut()
+bool Sword::cut()
 {
 	//两种不同的方式计算角度
 	float angle;
@@ -125,25 +125,32 @@ bool Fork::cut()
 		}
 		angle = sita * 180 / 4;
 	}
-	
+
 
 	//生成攻击特效
 
-	auto damage = Bullet::create("ArtDesigning/FlyingItem/Bullet/ForkEffect.png",
-								  attackNumber,
-								  0,
-								  owner,
-								  NULL);
+	auto damage = Bullet::create("ArtDesigning/FlyingItem/Bullet/SwordEffect_1.png",
+		attackNumber,
+		0,
+		owner,
+		NULL);
 	damage->setAttackMode(MELEE);
+	damage->setTag(725);
 	damage->setPosition(owner->getPosition().x + 20 * cos(angle / 180 * M_PI),
-					    owner->getPosition().y + 20 * sin(angle / 180 * M_PI));
-	damage->setGiveOutTime(GetCurrentTime()/1000.f);
+		owner->getPosition().y + 20 * sin(angle / 180 * M_PI));
+	damage->setGiveOutTime(GetCurrentTime() / 1000.f);
 	damage->setOwnerWeapon(this);
-	if (angle>=90&&angle<=270)
+	if (!(angle >= 90 && angle <= 270))
 		damage->setScaleX(-1.0);
+	auto animation = Animation::create();
+	animation = AnimationCache::getInstance()->getAnimation("Sword");
+	animation->setDelayPerUnit(1.0f / 5.0f);
+	animation->setLoops(-1);
+	auto animate = Animate::create(animation);
+	damage->runAction(RepeatForever::create(animate));
+
 	owner->getExploreScene()->specialBullet.pushBack(damage);
 	owner->getExploreScene()->getMap()->addChild(damage);
 
 	return true;
 }
-

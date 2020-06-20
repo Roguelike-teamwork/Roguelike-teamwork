@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="right-down" width="90" height="78" tilewidth="32" tileheight="32" infinite="0" nextlayerid="18" nextobjectid="12">
+<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="90" height="78" tilewidth="32" tileheight="32" infinite="0" nextlayerid="21" nextobjectid="12">
  <tileset firstgid="1" name="source1" tilewidth="32" tileheight="32" tilecount="256" columns="16">
   <image source="source1.png" width="512" height="512"/>
   <tile id="118">
@@ -1932,19 +1932,24 @@
    </properties>
   </tile>
  </tileset>
- <layer id="13" name="collusion" width="90" height="78">
-  <data encoding="base64" compression="zlib">
-   eJzt00mKhEAQQFGl7n/nWgmFmJrGmBH1A/6iG3J6du+fbduJiIiIiIiIiIiIiIiIaJh2zvtkv2fVcO7nPLtXxzS2V+ufzro7M9si0lnjj/N7Z63304y+Qdeu3h09Kzi/va/1/to7zd5bev+Ozr8m0hmZSu/f0XlmTaZVlLPHWDpLzspy9v4G531xnreLnOz/fyvnCCft+op5vxHneOc3593tUbFI5yfr2fUVi3bWTraXh3v0d8SZcK4Zzjh3CmecO4Uzzp3CGedO4VzD2WKyDXDuk5Wzxj/bwNvV4v0Wk22S7Rw1Hvf/B+fZs4/f4SwbnG0cpW+MnNWc794v/W44j+8jveuqs5Lz8XOU82i95u+kgrPFXWccLU0s717VWTo4r+dMRERERERERERERH59AQDlXI0=
-  </data>
- </layer>
  <layer id="14" name="ground" width="90" height="78">
   <data encoding="base64" compression="zlib">
    eJzt2lEKwjAQRdGuRl2BugJ1R25fIQhS2jhJpq+TeA/k23phmlozTQAAAAAAAAAAAOjV4b2OTuskvvaenN/r4rSu4mvvibJzbnZGnwVl59xnjT4LdNbw7pzbJ+m8/9q7s/W5q3YfoXNi7VB7nXROeut8z6xROtf8huN5I4ky13SOs361uk3r95RHRRtPI3WOrKRzbg+q2Zvo7PcdeV+X0FmDzhrzPXrtfly7X9N52aeL13fKPWuVrr2fzTx5d8YyOmvQWYPOGnTWoLMGnTXorEFnDTprtHZuPR86+jm4j9bOre+N/mWO6LyN+Zx/d66ZZzovK3nP/5ytLc5rlHa27AcR7vnR/u8u7Wy5/ggzQmeNiJ1PxmW9T/XWWX1eY68Z2YL3/93R5oPObXNTMj90bm8y2v2Zzm1672w5HxLh3If1HIv1WlvPxURoAgAAAAAAAABIXvHBINA=
   </data>
  </layer>
+ <layer id="13" name="collision" width="90" height="78">
+  <data encoding="base64" compression="zlib">
+   eJzt00mKhEAQQFGl7n/nWgmFmJrGmBH1A/6iG3J6du+fbduJiIiIiIiIiIiIiIiIaJh2zvtkv2fVcO7nPLtXxzS2V+ufzro7M9si0lnjj/N7Z63304y+Qdeu3h09Kzi/va/1/to7zd5bev+Ozr8m0hmZSu/f0XlmTaZVlLPHWDpLzspy9v4G531xnreLnOz/fyvnCCft+op5vxHneOc3593tUbFI5yfr2fUVi3bWTraXh3v0d8SZcK4Zzjh3CmecO4Uzzp3CGedO4VzD2WKyDXDuk5Wzxj/bwNvV4v0Wk22S7Rw1Hvf/B+fZs4/f4SwbnG0cpW+MnNWc794v/W44j+8jveuqs5Lz8XOU82i95u+kgrPFXWccLU0s717VWTo4r+dMRERERERERERERH59AQDlXI0=
+  </data>
+ </layer>
  <layer id="15" name="fence" width="90" height="78">
   <data encoding="base64" compression="zlib">
    eJzt2jEOgCAQRUFu7Q2MN/C6tsbCKOIngZlk+82DDkoBAAAAAAAAAID/bb0XmITOGTpn6EwrtXdpbbrF+HTO0DlDZ4C+9tMAAAAAAMxguQyM6Ok7rHfXb3TO0Dkj1fntPxHnWkfnDJ0BAAAAAADg3gFMmxFc
+  </data>
+ </layer>
+ <layer id="18" name="fenceBool" width="90" height="78" opacity="0.2">
+  <data encoding="base64" compression="zlib">
+   eJzt2rENACAMA8Eg9t85PQWlEcrdBNbXrgIAAAAAAAAAAADgtPbrBTPonKFzhs4AAAAAAAAAAH/x98jQOUNnAAAAAAAAuGvptgAd
   </data>
  </layer>
  <layer id="16" name="cover2" width="90" height="78">
@@ -1957,17 +1962,22 @@
    eJzt2s1JA0EYgOFlytEaRBsQixA8eFQR/MGLIqiLFyU1WIIl2IqmAvXiFzOBFUJgQ2YC7vPAR1jIZuGdYfaSpgEAAAAAAAAA1q1NTXMZ853633u1xD3/0Xt0+CjY4lHnX5/R4Svv1XHBJm3nt3cG1H5coe082/l5WwNqvQ57ue+uzis1ew/Ozo0hnRk1eQ/SdRb74Tzmwr4o6i763sc8FOp8ZP2qONa5Cp3LO+nR+Dq+u5+sy7LaBd1O03QtJm2fNAYAAAAAYI7D9HcASnhxvlTxqjMrdmtPVTGKzjdaF3WQ+z5X6vwWz9nIs5mm1/TXbTj5XPQfGQAAAAAAgJJ+AOmOIc8=
   </data>
  </layer>
+ <layer id="19" name="collisionForFight" width="90" height="78" opacity="0.4">
+  <data encoding="base64" compression="zlib">
+   eJzt2NEJwCAMQEGl++/cCfwrL0jvJggvAcG1AAAAAAAAAACgsZ/pCf5B54bODZ2Z4vYaOjd0bugMALO8xQAAAAAA9/PX29C5oXPjq8721dC5oTMAAAAAAACcvWMTAEE=
+  </data>
+ </layer>
  <objectgroup id="4" name="objects" offsetx="-16" offsety="-20">
-  <object id="1" name="SpawnPoint" x="2078" y="1736" width="244" height="233">
+  <object id="1" name="SpawnPoint" x="2120" y="1806" width="44" height="61">
    <ellipse/>
   </object>
-  <object id="3" name="EnemyPoint" x="1359" y="1612" width="268" height="126"/>
-  <object id="4" name="EnemyPoint1" x="1169" y="1719" width="99" height="147"/>
-  <object id="5" name="EnemyPoint3" x="1499" y="646" width="260" height="178"/>
-  <object id="6" name="EnemyPoint4" x="1427" y="1041" width="193" height="156"/>
-  <object id="7" name="EnemyPoint5" x="1729" y="868" width="140" height="168"/>
-  <object id="8" name="NPCPoint1" x="551" y="1720" width="148" height="103"/>
+  <object id="3" name="EnemyPoint" x="1377" y="1668" width="134" height="42"/>
+  <object id="4" name="EnemyPoint1" x="1165" y="1761" width="49" height="105"/>
+  <object id="5" name="EnemyPoint3" x="1521" y="700" width="80" height="74"/>
+  <object id="6" name="EnemyPoint4" x="1427" y="1069" width="111" height="56"/>
+  <object id="7" name="EnemyPoint5" x="1729" y="868" width="58" height="54"/>
+  <object id="8" name="NPCPoint1" x="551" y="1770" width="102" height="53"/>
   <object id="9" name="LeftPoint" x="2260" y="832" width="80" height="44"/>
-  <object id="11" name="NPCPoint2" x="548" y="893" width="115" height="68"/>
+  <object id="11" name="NPCPoint2" x="548" y="929" width="77" height="32"/>
  </objectgroup>
 </map>

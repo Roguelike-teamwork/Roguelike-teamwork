@@ -29,7 +29,7 @@ bool Pistol::init(EAttackMode _equipType, String _weaponName, int _attack,
 
 	equipType = _equipType;
 	weaponName = _weaponName;
-
+	equipName = PISTOL;
 	attackNumber = _attack;
 	attackSpeedNumber = _attackSpeed;
 	attackRadius = _attackRadius;

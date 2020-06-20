@@ -85,7 +85,9 @@ void Dragon::chaosBullets()
 			bulletSprite->setcarryBuff(fire);
 
 			exploreScene->getMap()->addChild(bulletSprite);
+			exploreScene->getMap()->addChild(fire);
 			exploreScene->flyingItem.pushBack(bulletSprite);
+			exploreScene->allBuff.pushBack(fire);
 }
 
 void Dragon::roundBullets()
@@ -99,6 +101,8 @@ void Dragon::roundBullets()
 		auto fire = Buff::create(BURN, 0, 0, 0, 2.0f);
 		bulletSprite->setcarryBuff(fire);
 		exploreScene->getMap()->addChild(bulletSprite);
+		exploreScene->getMap()->addChild(fire);
+		exploreScene->allBuff.pushBack(fire);
 		exploreScene->flyingItem.pushBack(bulletSprite);
 	}
 }

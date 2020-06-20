@@ -34,7 +34,7 @@ bool UnMovingActor::init(const std::string& filename, GameScene* Scene, TOTALNPC
 	_spawnScene = Scene;
 	touchRadius = radius;
 
-	setTexture(String::createWithFormat("ArtDesigning/Sprite/NPC/%s.png",npcName.getCString())->getCString());
+	setTexture(String::createWithFormat("ArtDesigning/Sprite/NPC/%s_1.png",npcName.getCString())->getCString());
 
 	
 	putMessages = Label::create("","Marker Felt",30);
@@ -67,8 +67,8 @@ void UnMovingActor::effect(Fighter* customer)
 	{
 		if (!isMeet)
 		{
-			goodsType = random(0, 3);
-		
+			goodsType = random(0,2);
+			isMeet = true;
 		}
 
 		if (!isOver)
@@ -80,7 +80,7 @@ void UnMovingActor::effect(Fighter* customer)
 				else
 				{
 					_spawnScene->setCoinNum(_spawnScene->getCoinNum() - 15);
-					customer->takeBuff(Buff::create(EBuffType::NORMAL,150,0,0,0));
+					customer->takeBuff(Buff::create(EBuffType::NORMAL,150,0,0,5000));
 					isOver = true;
 				}
 			}
@@ -91,7 +91,7 @@ void UnMovingActor::effect(Fighter* customer)
 				else
 				{
 					_spawnScene->setCoinNum(_spawnScene->getCoinNum() - 15);
-					customer->takeBuff(Buff::create(EBuffType::NORMAL, 0, 300, 0, 0));
+					customer->takeBuff(Buff::create(EBuffType::NORMAL, 0, 300, 0, 5000));
 					isOver = true;
 				}
 			}
@@ -119,7 +119,7 @@ void UnMovingActor::effect(Fighter* customer)
 	{
 		if (!isMeet)
 		{
-			goodsType = random(0, 2);
+			goodsType = random(0, 1);
 			isMeet = true;
 		}
 		if (!isOver)
@@ -162,7 +162,8 @@ void UnMovingActor::effect(Fighter* customer)
 				putMessages->setString("You see something Gold inside");
 			else
 			{
-				_spawnScene->setCoinNum(_spawnScene->getCoinNum()+30);
+				_spawnScene->setCoinNum(_spawnScene->getCoinNum()+100);
+				setTexture(String::createWithFormat("ArtDesigning/Sprite/NPC/%s_2.png", npcName.getCString())->getCString());
 				isOver = true;
 			}
 		}
@@ -179,7 +180,8 @@ void UnMovingActor::effect(Fighter* customer)
 				putMessages->setString("Oh my god,it is bleeding");
 			else
 			{
-				customer->takeBuff(Buff::create(NORMAL,customer->getHitpoints()-customer->getCurHitPoints(),0,0,0));
+				customer->takeBuff(Buff::create(NORMAL,customer->getHitpoints()-customer->getCurHitPoints(),0,0,5000));
+				setTexture(String::createWithFormat("ArtDesigning/Sprite/NPC/%s_2.png", npcName.getCString())->getCString());
 				isOver = true;
 			}
 		}
@@ -196,7 +198,8 @@ void UnMovingActor::effect(Fighter* customer)
 			putMessages->setString("Something shinning inside");
 		else
 		{
-			customer->takeBuff(Buff::create(NORMAL,0,customer->getManaPoints()-customer->getCurManaPoints(), 0, 0));
+			customer->takeBuff(Buff::create(NORMAL,0,customer->getManaPoints()-customer->getCurManaPoints(), 0, 5000));
+			setTexture(String::createWithFormat("ArtDesigning/Sprite/NPC/%s_2.png", npcName.getCString())->getCString());
 			isOver = true;
 		}
 	}

@@ -62,19 +62,22 @@ void  Enemy::updateTarget()
 void Enemy::updateDestination()
 {
 	Vec2 tempDes;
-	if (!attackTarget||level==BOSS)
-	{
+
 		float tempX, tempY;
 
 		tempX = random(-30, 30) ;//如果过大，将出界，因为界外没有瓦片,不对其进行碰撞检测，直接框在房间里
 		tempY = random(-30, 30) ;
 
-
 		tempDes.x = getPosition().x + tempX;
 		tempDes.y = getPosition().y + tempY;
-	}
-	else
+	
+	if(attackTarget&&level!=BOSS)
 	{
+		if (attackTarget->getPosition() == getPosition())
+		{
+			destination = tempDes;
+			return;
+		}
 		if (attackTarget->getPosition().getDistance(this->getPosition()) > attackRadius)
 		{
 			tempDes = attackTarget->getPosition();
@@ -86,8 +89,9 @@ void Enemy::updateDestination()
 void Enemy::enemyMove()
 {
 	isMoving = true;
-	auto moveTime = destination.getDistance(this->getPosition()) / moveSpeed;
+	auto moveTime = destination.getDistance(getPosition()) / moveSpeed;
 	auto move = MoveTo::create(moveTime,this->getDestination());
+	move->setTag(982);
 	this->runAction(move);
 }
 
@@ -108,12 +112,13 @@ bool Enemy::attack()
 		
 		return true;
 	}
-	return true;
+	return false;
 }
 
 void Enemy::die()
 {
 	setVisible(false);
+	exploreScene->setCoinNum(exploreScene->getCoinNum()+5);
 	alreadyDead = true;
 }
 void Enemy::updateAction()
@@ -123,6 +128,11 @@ void Enemy::updateAction()
 		if (nowTime - lastAttackTime < attackSpeed)
 			return;
 
+	if (!isToMove)
+	{
+		isMoving = false;
+		stopActionByTag(982);
+	}
 	updateTarget();
 	if (attackTarget)
 	{

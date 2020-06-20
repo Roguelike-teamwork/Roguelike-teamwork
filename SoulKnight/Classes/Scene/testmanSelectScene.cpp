@@ -1,5 +1,7 @@
 #include "testmanSelectScene.h"
 #include "GameScene.h"
+#include "Scene/Stage_1.h"
+#include "Scene/Stage_2.h"
 #include "SimpleAudioEngine.h" 
 #include "cocos2d.h"
 
@@ -110,7 +112,7 @@ void testmanSelect::menuExitCallBack(cocos2d::Ref* pSender)
 void testmanSelect::menuPlayCallBack(cocos2d::Ref* pSender)
 {
 	//¿ªÊ¼ÓÎÏ·
-	auto nextScene = GameScene::create();
+	auto nextScene = Stage_1::create();
 	Director::getInstance()->replaceScene(
 		TransitionSlideInT::create(1.0f / 60, nextScene));
 	MenuItem* item = static_cast<MenuItem*>(pSender);

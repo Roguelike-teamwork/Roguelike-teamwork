@@ -68,7 +68,8 @@ bool Fighter::initHeroData(GameScene* Scene, std::string Name)
 	curHitPoints = hitPoints;         //初始设定为满值
 	curShield = shield;		
 	curManaPoints = manaPoints;
-			
+	state = NORMAL;
+
 	return true;
 }
 
@@ -85,12 +86,18 @@ bool Fighter::isFullEquipments()
 
 Equipment* Fighter::changeMainEquip()    //待添加切换武器的音效
 {
-	if (isFullEquipments())
+	if (myWeapon.size()>=1)
 	{
 		for (auto it = myWeapon.begin(); it != myWeapon.end(); it++)
 		{
-			if (currentWeapon != *it)
-				return *it;
+			if (currentWeapon == *it)
+			{
+				if (++it == myWeapon.end())
+				{
+					return *myWeapon.begin();
+				}
+				return *(it);
+			}
 		}
 	}
 	else
@@ -148,7 +155,6 @@ bool Fighter::isInMelee()           //判断enemy位于范围内，暂时不会�
 
 void Fighter::hurt(INT32 damage)
 {
-	CCLOG("HP=%d MP=%d SP=%d", curHitPoints, curManaPoints, curShield);
 	int currentDamage = damage;
 	if (!isZeroSheild())
 	{
@@ -204,9 +210,10 @@ void Fighter::updateCondition()
 		{
 			if (it->getTag() == 10795)
 			{
-				if (nowTime - it->getBeginTime() >= 2.0f)
+				if (nowTime - it->geteffectTime() >= 2.0f)
 				{
 					hurt(20);
+					it->seteffectTime(GetCurrentTime() / 1000.f);
 				}
 			}
 		}
@@ -217,13 +224,15 @@ void Fighter::updateCondition()
 		{
 			if (it->getTag() == 10795)
 			{
-				if (nowTime - it->getBeginTime() >= 1.0f)
+				if (nowTime - it->geteffectTime() >= 1.0f)
 				{
 					hurt(10);
+					it->seteffectTime(GetCurrentTime()/1000.f);
 				}
 			}
 		}
 	}
+
 
 	if (!canBeHurt)
 	{
@@ -237,6 +246,8 @@ void Fighter::updateCondition()
 			canBeHurt = true;
 		}
 	}
+
+	removeBuff();
 }
 
 Vec2 Fighter::updateDestination()       //
@@ -374,28 +385,21 @@ void Fighter::stand()
 void Fighter::updateTarget()
 {
 	MovingActor* tempTarget = NULL;
+	Vector<Enemy*>& allEnemy = exploreScene->allEnemy;
 	Vector<Enemy*>& allEnemySoldier = exploreScene->enemySoldier;
 	Vector<Enemy*>& allEnemyBoss = exploreScene->enemyBoss;
 
-	if (allEnemySoldier.empty() && allEnemyBoss.empty())
+	if (allEnemy.empty())
 	{
 		attackTarget = NULL;
 		return;
 	}
-	if (!allEnemyBoss.empty())
-	{
-		auto temp = allEnemyBoss.begin();
-		if (!(*temp)->getAlreadyDead() && !allEnemyBoss.empty())
-		{
-			tempTarget = *temp;
-		}
-	}
-	if (!allEnemySoldier.empty())
+	if (!allEnemy.empty())
 	{
 		if (!tempTarget)
 		{
 			float tempRadius = identityRadius;
-			for (auto tempSoldier = allEnemySoldier.begin(); tempSoldier != allEnemySoldier.end(); ++tempSoldier)
+			for (auto tempSoldier = allEnemy.begin(); tempSoldier != allEnemy.end(); ++tempSoldier)
 			{
 				float calRadius = (*tempSoldier)->getPosition().getDistance(this->getPosition());
 				if (calRadius < tempRadius)
@@ -422,21 +426,8 @@ bool Fighter::isZeroSheild()
 
 void Fighter::getWeapon(Equipment* available)
 {
-	if (myWeapon.size() == equipNumber)
-	{
-		for (auto it = myWeapon.begin(); it != myWeapon.end(); it++)
-			if (currentWeapon == *it)
-			{
-				(*it)->setNowState(WeaponStatus::GROUND);
-				exploreScene->allWeapon.pushBack(*it);
-				*it = available;
-			}
-	}
-	else
-	{
 		myWeapon.pushBack(available);
 		currentWeapon = available;
-	}
 }
 
 
@@ -472,19 +463,20 @@ void Fighter::takeBuff(Buff* buff)
 	this->curManaPoints += buff->getBuffMp();
 	this->moveSpeed += buff->getBuffMoveSpeed();
 
-	if ((buff->getBuffType() == BURN || buff->getBuffType() == POISON)&&state==COMMON)
+	if ((buff->getBuffType() == BURN || buff->getBuffType() == POISON)&&state==NORMAL)
 	{
 		state = buff->getBuffType();
 		buff->setTag(10795);
 	}
-	buff->setBeginTime(GetCurrentTime());
+	buff->setBeginTime(GetCurrentTime() / 1000.f);
+	buff->seteffectTime(GetCurrentTime() / 1000.f);
 
 	this->myBuff.pushBack(buff);
 }
 
 void Fighter::removeBuff()
 {
-	auto nowTime = GetCurrentTime();
+	auto nowTime = GetCurrentTime()/1000.f;
 
 	for (auto it = myBuff.begin(); it != myBuff.end();)
 	{
@@ -495,7 +487,7 @@ void Fighter::removeBuff()
 				this->curManaPoints -= (*it)->getBuffMp();
 				this->moveSpeed -= (*it)->getBuffMoveSpeed();
 
-				if (state == (*it)->getBuffType())
+				if ((*it)->getTag()==10795)
 					state = NORMAL;
 				it = myBuff.erase(it);
 		}

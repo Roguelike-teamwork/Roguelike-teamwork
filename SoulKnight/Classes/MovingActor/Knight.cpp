@@ -3,6 +3,7 @@
 #include"MovingActor/Equipment.h"
 #include"MovingActor/Bullet.h"
 #include"Weapon/Fork.h"
+#include"Weapon/Sword.h"
 //#include "HelloWorldScene.h"
 
 
@@ -125,11 +126,23 @@ bool Knight::attack()
 			}
 			else
 			{
-				auto it = dynamic_cast<Fork*>(currentWeapon);
-				for (int i = 0; i < 1; i++)
+				if (currentWeapon->getEquipName() == FORK)
 				{
-					it->cut();
-					curManaPoints -= currentWeapon->getManaConsume();
+					auto it = dynamic_cast<Fork*>(currentWeapon);
+					for (int i = 0; i < 1; i++)
+					{
+						it->cut();
+						curManaPoints -= currentWeapon->getManaConsume();
+					}
+				}
+				else
+				{
+					auto it = dynamic_cast<Sword*>(currentWeapon);
+					for (int i = 0; i < 1; i++)
+					{
+						it->cut();
+						curManaPoints -= currentWeapon->getManaConsume();
+					}
 				}
 			}
 			lastAttackTime = GetCurrentTime() / 1000.f;
@@ -166,11 +179,23 @@ bool Knight::attack()
 			}
 			else
 			{
-				auto it = dynamic_cast<Fork*>(currentWeapon);
-				for (int i = 0; i < 1; i++)
+				if (currentWeapon->getEquipName() == FORK)
 				{
-					it->cut();
-					curManaPoints -= currentWeapon->getManaConsume();
+					auto it = dynamic_cast<Fork*>(currentWeapon);
+					for (int i = 0; i < 1; i++)
+					{
+						it->cut();
+						curManaPoints -= currentWeapon->getManaConsume();
+					}
+				}
+				else
+				{
+					auto it = dynamic_cast<Sword*>(currentWeapon);
+					for (int i = 0; i < 1; i++)
+					{
+						it->cut();
+						curManaPoints -= currentWeapon->getManaConsume();
+					}
 				}
 			}
 			lastAttackTime = GetCurrentTime() / 1000.f;

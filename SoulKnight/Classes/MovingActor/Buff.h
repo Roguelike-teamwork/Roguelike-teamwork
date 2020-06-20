@@ -29,7 +29,7 @@ class Buff :public cocos2d::Sprite
 
 	CC_SYNTHESIZE(float, duration, Duration);   //持续时间
 	CC_SYNTHESIZE(float, beginTime, BeginTime); //开始时间
-	CC_SYNTHESIZE(float, endTime, EndTime);		//结束时间
+	CC_SYNTHESIZE(float, effectTime, effectTime);		//结束时间
 public:
 	bool init(EBuffType _bufftype,
 		int _buffHP, int _buffMP,

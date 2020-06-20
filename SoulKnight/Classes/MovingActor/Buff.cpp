@@ -42,7 +42,6 @@ bool Buff::init(EBuffType _bufftype,
 
     //
     beginTime = GetCurrentTime() / 1000.f;
-    endTime = beginTime + duration;
 
     return true;
 

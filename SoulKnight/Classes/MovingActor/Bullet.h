@@ -6,6 +6,7 @@
 #include<string>
 #include"MovingActor/Constant.h"
 #include"MovingActor/Buff.h"
+#include"MovingActor/Equipment.h"
 
 USING_NS_CC;
 
@@ -15,6 +16,7 @@ class Bullet :public cocos2d::Sprite
 {
 	CC_SYNTHESIZE(EAttackMode,attackMode,AttackMode);
 	CC_SYNTHESIZE(INT32, _damage, Damage);
+	CC_SYNTHESIZE(Equipment*, ownerWeapon, OwnerWeapon);
 	CC_SYNTHESIZE(bool, isToClean, IsToClean);
 	CC_SYNTHESIZE(float, _flySpeed, FlySpeed);
 	CC_SYNTHESIZE(float, giveOutTime, GiveOutTime);

@@ -10,7 +10,7 @@
 #define SHIELD_RECOVER_TIME 1.0f     //主角护盾击破后刷新时间初始化1.0f
 #define INIT_ID_RADIUS 300        //移动角色的感应半径，探知范围内是否有其他移动物体  
 
-#define	KNIGHT_HP 100
+#define	KNIGHT_HP 200
 #define KNIGHT_MP 400
 #define KNIGHT_SHIELD 50
 #define KNIGHT_MOVESPEED 4
@@ -20,17 +20,32 @@
 
 #define GOBLIN_HP 50
 #define GOBLIN_DAMAGE 5
-#define GOBLIN_FLYSPEED 10
+#define GOBLIN_FLYSPEED 15
 #define GOBLIN_MOVESPEED 30
 #define GOBLIN_IDR 350
 #define GOBLIN_ATTACKR 275
 #define GOBLIN_ATTACKSPEED 1
 
+#define CROW_HP 75
+#define CROW_DAMAGE 10
+#define CROW_FLYSPEED 20
+#define CROW_MOVESPEED 30
+#define CROW_IDR 350
+#define CROW_ATTACKR 275
+#define CROW_ATTACKSPEED 1
+
+#define RABBIT_HP 150
+#define RABBIT_DAMAGE 30
+#define RABBIT_MOVESPEED 240
+#define RABBIT_IDR 300
+#define RABBIT_ATTACKR 100
+#define RABBIT_ATTACKSPEED 2
+
 #define PIG_HP 200
 #define PIG_DAMAGE 30
-#define PIG_MOVESPEED 80
-#define PIG_IDR 400
-#define PIG_ATTACKR 50
+#define PIG_MOVESPEED 170
+#define PIG_IDR 300
+#define PIG_ATTACKR 100
 #define PIG_ATTACKSPEED 2
 
 #define DRAGON_HP 1500
@@ -38,16 +53,23 @@
 #define DRAGON_MOVESPEED 60
 #define DRAGON_FLYSPEED 7
 
-#define PISTOL_DAMAGE 7
-#define PISTOL_ATTACKSPEED 0.7
-#define PISTOL_FLYSPEED 16
-#define PISTOL_MPCONSUME 5
+#define PISTOL_DAMAGE 20
+#define PISTOL_ATTACKSPEED 1
+#define PISTOL_FLYSPEED 30
+#define PISTOL_MPCONSUME 2
 
-#define FORK_DAMAGE 4
-#define FORK_ATTACKSPEED 1.0
+#define FORK_DAMAGE 10
+#define FORK_ATTACKSPEED 0.5
 #define FORK_MPCONSUME 2
+#define FORK_ATTACKR 40
 
+#define SWORD_DAMAGE 3
+#define SWORD_ATTACKSPEED 4
+#define SWORD_MPCONSUME 20
+#define SWORD_ATTACKR 150
 
+#define POISON_LASTTIME 2
+#define BURN_LASTTIME 2
 
 #define INIT_MOVESPEED 3.0
 #define INIT_EQUIP_NUMBER 2
@@ -88,11 +110,25 @@ enum AllCamp        //阵营
 //可能会定义的
 enum EEQUIPMENT
 {
-	POJIUDESHOUQIANG,
-	AK47,
-	GANCAOCHA,
+	PISTOL,
+	FORK,
+	SWORD,
 	HAND
 	//TBD
+};
+
+enum Stage_State
+{
+	SPAWNROOM_1,
+	ROOM_1_1,
+	ROOM_1_2,
+	ROOM_1_3,
+	SPAWNROOM_2,
+	ROOM_2_1,
+	ROOM_2_2,
+	ROOM_2_3,
+	ROOM_2_4,
+	ROOM_2_5
 };
 
 //可能会定义的方向枚举类型

@@ -25,6 +25,7 @@ class GameScene : public cocos2d::Scene
 
 	//CC_SYNTHESIZE(Vector<Projectile*>, _bullets, Bullets);      子弹
 	//CC_SYNTHESIZE(std::vector<Damage>, _damages, AllDamages);   伤害
+	CC_SYNTHESIZE(Stage_State, roomState, RoomState);
 	CC_SYNTHESIZE(Record*, _labelRecord, LabelRecord);
 	CC_SYNTHESIZE(Fighter*, _myFighter, MyFighter);
 	CC_SYNTHESIZE(MoveController*, _rocker, Rocker);
@@ -37,28 +38,30 @@ class GameScene : public cocos2d::Scene
 	//CC_SYNTHESIZE(MapInfo, _mapInformation, MapInformation);
 	cocos2d::TMXLayer* _collidable;
 	cocos2d::TMXLayer* _collidable2;
+	cocos2d::TMXLayer* _fence;
 	cocos2d::TMXLayer* _fenceBool;
 	cocos2d::TMXLayer* _collisionForFight;
-	LabelTTF* hitpoints;
-	LabelTTF* shield;
-	LabelTTF* manapoints;
+	cocos2d::TMXLayer* _transfer;
+	cocos2d::TMXLayer* _enemyCollision;
 	Label* coin;
 	Sprite* coinPicture;
 	bool collisionForFightBool = false;
-private:
+public:
 	//初始化
-	void generateEnemies(float delta);
+	bool islegal(int X,int Y,Stage_State _stage);
+	void toNextScene(float delta);
 	void generateComp();
-	void initMapLayer();
 	void initFighter();
 	void initListener();
 	void initComp();
+	void initController();
 	void initCoin();
+	void initUI();
 	void initNextScene();
 	void initSettingMenu();
-	//update函数合集
 	void updateFighterPosition();
 	void updateNPC();
+	void updateUI();
 	void updateEnemyPosition();
 	void updateFlyingItem();
 	void updateSpecialBullet();
@@ -89,7 +92,7 @@ private:
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 
 	MenuItemImage* menuMenu;
-public:
+
 	//可以公开使用的一些容器
 	Vector<Enemy*> enemySoldier;
 	Vector<Enemy*> enemyBoss;
@@ -99,6 +102,8 @@ public:
 	Vector<Bullet*> flyingItem;
 	Vector<Bullet*> specialBullet;
 	Vector<UnMovingActor*> allNpc;
+	Vector<Buff*> allBuff;
+	Vector<Sprite*> allUI;
 	Vector<Comp*> allComp;
 
 

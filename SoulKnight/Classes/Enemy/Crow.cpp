@@ -1,14 +1,14 @@
 #include"MovingActor/Enemy.h"
-#include"Enemy/Goblin.h"
+#include"Enemy/Crow.h"
 #include"MovingActor/Buff.h"
 #include"MovingActor/Constant.h"
 #include"MovingActor/Bullet.h"
 #include"Scene/GameScene.h"
 #include<vector>
 
-Goblin* Goblin::create(GameScene* Scene, std::string Name)
+Crow* Crow::create(GameScene* Scene, std::string Name)
 {
-	Goblin* enemy = new Goblin();
+	Crow* enemy = new Crow();
 	if (enemy && enemy->init(Scene, Name));
 	{
 		enemy->autorelease();
@@ -19,7 +19,7 @@ Goblin* Goblin::create(GameScene* Scene, std::string Name)
 	return nullptr;
 }
 
-bool Goblin::init(GameScene* Scene, std::string Name)
+bool Crow::init(GameScene* Scene, std::string Name)
 {
 	if (!Enemy::init(Scene, Name))
 		return false;
@@ -28,7 +28,7 @@ bool Goblin::init(GameScene* Scene, std::string Name)
 	return true;
 }
 
-bool Goblin::initData(GameScene* Scene, std::string Name)
+bool Crow::initData(GameScene* Scene, std::string Name)
 {
 	exploreScene = Scene;
 	enemyName = Name;
@@ -38,30 +38,30 @@ bool Goblin::initData(GameScene* Scene, std::string Name)
 
 
 
-	attackSpeed = GOBLIN_ATTACKSPEED;
-	hitPoints = GOBLIN_HP;
+	attackSpeed = CROW_ATTACKSPEED;
+	hitPoints = CROW_HP;
 	curHitPoints = hitPoints;    //数据具体化，不动用plist
-	damageAbility = GOBLIN_DAMAGE;
-	moveSpeed = GOBLIN_MOVESPEED;
-	identityRadius = GOBLIN_IDR;
-	attackRadius = GOBLIN_ATTACKR;
+	damageAbility = CROW_DAMAGE;
+	moveSpeed = CROW_MOVESPEED;
+	identityRadius = CROW_IDR;
+	attackRadius = CROW_ATTACKR;
 
 	alreadyDead = false;
 	everAttack = false;
 
-	setTexture("ArtDesigning/Sprite/Enemy/Goblin/Goblin1.png");
+	setTexture("ArtDesigning/Sprite/Enemy/Crow/Crow1.png");
 	loadAnimation();
 	this->runAction(normal);
 
 	return true;
 }
 
-bool Goblin::loadAnimation()
+bool Crow::loadAnimation()
 {
 	Animation* normalAnimation = Animation::create();
 	for (int i = 1; i <= 2; i++)
 	{
-		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Enemy/Goblin/Goblin%d.png",i);
+		auto frameName = String::createWithFormat("ArtDesigning/Sprite/Enemy/Crow/Crow%d.png", i);
 		normalAnimation->addSpriteFrameWithFileName(frameName->getCString());
 
 	}
@@ -72,12 +72,12 @@ bool Goblin::loadAnimation()
 }
 
 
-bool Goblin::attack()
+bool Crow::attack()
 {
 
 	if (attackTarget)
 	{
-		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/GoblinBullet.png", damageAbility, 5, this, attackTarget);
+		auto bulletSprite = Bullet::create("ArtDesigning/FlyingItem/Bullet/CrowBullet.png", damageAbility, 5, this, attackTarget);
 
 		//对飞行物的调整
 		bulletSprite->setPosition(this->getPosition());
@@ -85,6 +85,7 @@ bool Goblin::attack()
 		auto fire = Buff::create(EBuffType::POISON, 0, 0, 0, 4.0f);
 		bulletSprite->giveOut();
 		bulletSprite->setcarryBuff(fire);
+		bulletSprite->setScale(0.625);
 		//将飞行物放入场景的容器之中
 		exploreScene->getMap()->addChild(fire);
 		exploreScene->getMap()->addChild(bulletSprite);
