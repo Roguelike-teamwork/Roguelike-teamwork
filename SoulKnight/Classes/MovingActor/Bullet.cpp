@@ -20,7 +20,8 @@ bool Bullet::init(const std::string& filename, INT32 damage, float flySpeed, Mov
 		return false;
 
 	setTexture(filename);
-	setPosition(owner->getPosition());
+	if(owner)
+		setPosition(owner->getPosition());
 
 	_damage = damage;
 	_flySpeed = flySpeed;
@@ -108,4 +109,8 @@ void Bullet::fly()
 	auto velocityY = getFlySpeed() * sin(angle / 180 * M_PI);
 
 	setPosition(getPosition()+Vec2(velocityX,velocityY));
+
+	if(getOwner()->getCamp()==FRIENDLY)
+		if (getOwnerWeapon()->getEquipName()==DART)
+			setRotation(getRotation() + 15);
 }

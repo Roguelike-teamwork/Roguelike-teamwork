@@ -9,12 +9,12 @@ USING_NS_CC;
 class SafetyMap :public cocos2d::Scene
 {
 	CC_SYNTHESIZE(cocos2d::TMXTiledMap*, _map, Map);
+	CC_SYNTHESIZE(cocos2d::Layer*, _manlayer, Manlayer);
+	CC_SYNTHESIZE(int, _diamondNum, DiamondNum);
+	CC_SYNTHESIZE(int, _grade, Grade);
 	cocos2d::TMXTiledMap* _tileMap;
 	Label* diamond;
 	Sprite* diamondPicture;
-	int diamondNum = 0;
-	
-
 private:
 	//≥ı ºªØ
 	void initMapLayer();
@@ -26,7 +26,7 @@ public:
 	void menuAudioCallBack(cocos2d::Ref* pSender);
 	void menuTestManCallBack(cocos2d::Ref* pSender);
 	void menuMenuCallBack(cocos2d::Ref* pSender);
-
+	void BookMenuCallBack(cocos2d::Ref* pSender);
 	CREATE_FUNC(SafetyMap);
 };
 

@@ -7,8 +7,6 @@ USING_NS_CC;
 
 enum EBuffType
 {
-	VERTIGO,	//яётн
-	FROZEN,     //╠Ы╤Ё
 	BURN,       //вфиу
 	POISON,     //жп╤╬
 	SPEEDUP,    //╪скы

@@ -6,6 +6,7 @@
 #include "MovingActor/MovingActor.h"
 #include "MovingActor/Bullet.h"
 #include "MovingActor/UnMovingActor.h"
+#include "Scene/testmanSelectScene.h"
 #include "Comp/Comp.h"
 #include "Controller/MoveCtrl.h"
 #include <vector>
@@ -25,6 +26,7 @@ class GameScene : public cocos2d::Scene
 
 	//CC_SYNTHESIZE(Vector<Projectile*>, _bullets, Bullets);      子弹
 	//CC_SYNTHESIZE(std::vector<Damage>, _damages, AllDamages);   伤害
+	CC_SYNTHESIZE(testmanSelect*, _ptesmanSelect, PtestmanSelect);
 	CC_SYNTHESIZE(Stage_State, roomState, RoomState);
 	CC_SYNTHESIZE(Record*, _labelRecord, LabelRecord);
 	CC_SYNTHESIZE(Fighter*, _myFighter, MyFighter);
@@ -35,6 +37,8 @@ class GameScene : public cocos2d::Scene
 	CC_SYNTHESIZE(TMXTiledMap*, _map, Map);
 	CC_SYNTHESIZE(Equipment*,tempWeapon,TempWeapon);
 	CC_SYNTHESIZE(int, coinNum, CoinNum);
+	CC_SYNTHESIZE(bool, poisonState, PoisonState);
+	CC_SYNTHESIZE(float, poisonTime, PoisonTime);
 	//CC_SYNTHESIZE(MapInfo, _mapInformation, MapInformation);
 	cocos2d::TMXLayer* _collidable;
 	cocos2d::TMXLayer* _collidable2;
@@ -43,6 +47,7 @@ class GameScene : public cocos2d::Scene
 	cocos2d::TMXLayer* _collisionForFight;
 	cocos2d::TMXLayer* _transfer;
 	cocos2d::TMXLayer* _enemyCollision;
+	cocos2d::TMXLayer* _spikeweed;
 	Label* coin;
 	Sprite* coinPicture;
 	bool collisionForFightBool = false;
@@ -57,7 +62,6 @@ public:
 	void initController();
 	void initCoin();
 	void initUI();
-	void initNextScene();
 	void initSettingMenu();
 	void updateFighterPosition();
 	void updateNPC();
@@ -67,6 +71,8 @@ public:
 	void updateSpecialBullet();
 	void updateComp();
 	void updateWeapon();
+	//异族
+	void updateGrade();
 	void clearObject();
 	bool _gameBegin;
 
@@ -77,7 +83,6 @@ public:
 	EventListenerTouchOneByOne* listenerTouch;
 	EventListenerKeyboard* listenerKeyBoard;
 	//
-	void menuPlayCallBack(cocos2d::Ref* pSender);
 	void menuMenuCallBack(cocos2d::Ref* pSender);
 
 	//按键事件
@@ -105,15 +110,19 @@ public:
 	Vector<Buff*> allBuff;
 	Vector<Sprite*> allUI;
 	Vector<Comp*> allComp;
+	Vector<Sprite*> item;
 
+	static GameScene* create(testmanSelect* scene);
+	static cocos2d::Scene* createScene(testmanSelect* scene);
 
-	static cocos2d::Scene* createScene();
-	virtual bool init();
+	virtual void updateMusic();
+	virtual void updateItem();
+	virtual bool init(testmanSelect* scene);
 	virtual void loadingAnimation();
 	virtual void update(float delta);
 	void CircleDamage(Point point, float radius, float damage);
-	
-	CREATE_FUNC(GameScene);
+	void endGame();
+
 };
 
 

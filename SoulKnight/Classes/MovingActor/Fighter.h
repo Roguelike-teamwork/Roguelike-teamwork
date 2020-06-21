@@ -30,7 +30,7 @@ class Fighter :public MovingActor
 
 	CC_SYNTHESIZE(int, manaPoints, ManaPoints);			//法力值上限
 	CC_SYNTHESIZE(int, curManaPoints, CurManaPoints);	//当前法力值
-
+	CC_SYNTHESIZE(float, tempMove, TempMove);
 	CC_SYNTHESIZE(String, fighterName, FighterName);	//获取角色名
 	CC_SYNTHESIZE(int, equipNumber, EquipNumber);     //所能携带的武器数量
 	CC_SYNTHESIZE(Equipment*, currentWeapon, CurrentWeapon);  //当前武器

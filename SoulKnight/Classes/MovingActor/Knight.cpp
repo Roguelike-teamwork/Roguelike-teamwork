@@ -30,17 +30,61 @@ bool Knight::init(GameScene* Scene, std::string Name)
 		return false;
 	}
 	//待初始化数据
-	hitPoints = KNIGHT_HP;
-	curHitPoints = hitPoints;
-	lastSkillTime =	KNIGHT_SKILLTIME;
-	skillCDTime = KNIGHT_SKILLCD;
-	moveSpeed = KNIGHT_MOVESPEED;
-	manaPoints = KNIGHT_MP;
-	curManaPoints = manaPoints;
-	shield = KNIGHT_SHIELD;
-	curShield = shield;
-	identityRadius = KNIGHT_IDR;
+	exploreScene = Scene;
 
+	if (Scene->getPtestmanSelect()->getGrade() == 0)
+	{
+		hitPoints = KNIGHT_HP;
+		curHitPoints = hitPoints;
+		lastSkillTime = KNIGHT_SKILLTIME;
+		skillCDTime = KNIGHT_SKILLCD;
+		moveSpeed = KNIGHT_MOVESPEED;
+		manaPoints = KNIGHT_MP;
+		curManaPoints = manaPoints;
+		shield = KNIGHT_SHIELD;
+		curShield = shield;
+		identityRadius = KNIGHT_IDR;
+	}
+	else if (Scene->getPtestmanSelect()->getGrade() == 1)
+	{
+		hitPoints = KNIGHT_HP_1;
+		curHitPoints = hitPoints;
+		lastSkillTime = KNIGHT_SKILLTIME_1;
+		skillCDTime = KNIGHT_SKILLCD_1;
+		moveSpeed = KNIGHT_MOVESPEED_1;
+		manaPoints = KNIGHT_MP_1;
+		curManaPoints = manaPoints;
+		shield = KNIGHT_SHIELD_1;
+		curShield = shield;
+		identityRadius = KNIGHT_IDR;
+	}
+	else if (Scene->getPtestmanSelect()->getGrade() == 2)
+	{
+		hitPoints = KNIGHT_HP_2;
+		curHitPoints = hitPoints;
+		lastSkillTime = KNIGHT_SKILLTIME_2;
+		skillCDTime = KNIGHT_SKILLCD_2;
+		moveSpeed = KNIGHT_MOVESPEED_2;
+		manaPoints = KNIGHT_MP_2;
+		curManaPoints = manaPoints;
+		shield = KNIGHT_SHIELD_2;
+		curShield = shield;
+		identityRadius = KNIGHT_IDR;
+	}
+	else if (Scene->getPtestmanSelect()->getGrade() == 3)
+	{
+		hitPoints = KNIGHT_HP_3;
+		curHitPoints = hitPoints;
+		lastSkillTime = KNIGHT_SKILLTIME_3;
+		skillCDTime = KNIGHT_SKILLCD_3;
+		moveSpeed = KNIGHT_MOVESPEED_3;
+		manaPoints = KNIGHT_MP_3;
+		curManaPoints = manaPoints;
+		shield = KNIGHT_SHIELD_3;
+		curShield = shield;
+		identityRadius = KNIGHT_IDR;
+	}
+	tempMove = moveSpeed;
 	fighterName = Name;
 	//TBD
 
@@ -119,6 +163,7 @@ bool Knight::attack()
 							this->getPosition().y + (1 - 2 * i) * 5 * cos(bulletSprite->getAngle() / 180 * M_PI)));
 
 					bulletSprite->setAttackMode(REMOTE);
+					bulletSprite->setOwnerWeapon(currentWeapon);
 					exploreScene->getMap()->addChild(bulletSprite);
 					exploreScene->flyingItem.pushBack(bulletSprite);
 					curManaPoints -= currentWeapon->getManaConsume();
@@ -172,6 +217,7 @@ bool Knight::attack()
 
 					bulletSprite->setScale(0.75f, 0.75f);
 					bulletSprite->setAttackMode(REMOTE);
+					bulletSprite->setOwnerWeapon(currentWeapon);
 					exploreScene->getMap()->addChild(bulletSprite);
 					exploreScene->flyingItem.pushBack(bulletSprite);
 					curManaPoints -= currentWeapon->getManaConsume();

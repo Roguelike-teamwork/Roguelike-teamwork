@@ -12,11 +12,12 @@ USING_NS_CC;
 class Stage_2 :public GameScene
 {
 public:
-	static Scene* createScene();
+	static Scene* createScene(testmanSelect* scene);
 
-	static Stage_2* create();
+	static Stage_2* create(testmanSelect* scene);
 
-	virtual bool init();
+	virtual bool init(testmanSelect* scene);
+
 
 	virtual void generateEnemies();
 

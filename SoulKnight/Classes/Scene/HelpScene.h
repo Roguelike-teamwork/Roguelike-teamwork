@@ -11,7 +11,6 @@ public:
 
 	virtual bool init();
 	
-	void menuAudioCallBack(cocos2d::Ref* pSender);
 	void menuExitCallBack(cocos2d::Ref* pSender);//返回上一场景
 
 	CREATE_FUNC(Help);

@@ -131,7 +131,7 @@ void UnMovingActor::effect(Fighter* customer)
 				else
 				{
 					_spawnScene->setCoinNum(_spawnScene->getCoinNum() - 50);
-					customer->takeBuff(Buff::create(EBuffType::SPEEDUP,0,0,2,5000));
+					customer->takeBuff(Buff::create(EBuffType::SPEEDUP,0,0,1.5,5000));
 					isOver = true;
 				}
 			}

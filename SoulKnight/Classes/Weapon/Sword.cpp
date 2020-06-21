@@ -150,7 +150,7 @@ bool Sword::cut()
 	damage->runAction(RepeatForever::create(animate));
 
 	owner->getExploreScene()->specialBullet.pushBack(damage);
-	owner->getExploreScene()->getMap()->addChild(damage);
+	owner->getExploreScene()->getMap()->addChild(damage,6);
 
 	return true;
 }

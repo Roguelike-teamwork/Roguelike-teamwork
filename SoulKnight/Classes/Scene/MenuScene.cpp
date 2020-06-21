@@ -28,11 +28,10 @@ bool MenuScene::init()
 
 	//menu
 	MenuItemImage* exitMenu = MenuItemImage::create(
-		"ArtDesigning/SceneAndMap/StartGame/EXIT.png",
-		"ArtDesigning/SceneAndMap/StartGame/EXITchosen.png",
+		"ArtDesigning/Word&Others/button/STARTGAME.PNG",
+		"ArtDesigning/Word&Others/button/STARTGAME.PNG",
 		CC_CALLBACK_1(MenuScene::menuExitCallBack, this)
 	);
-
 	if (exitMenu == nullptr ||
 		exitMenu->getContentSize().width <= 0 ||
 		exitMenu->getContentSize().height <= 0)
@@ -44,6 +43,7 @@ bool MenuScene::init()
 		float x = visibleSize.width / 4;
 		float y = visibleSize.height - 550;
 		exitMenu->setPosition(Vec2(x, y));
+		exitMenu->setScale(0.04);
 	}
 
 	MenuItemImage* cancelMenu = MenuItemImage::create(

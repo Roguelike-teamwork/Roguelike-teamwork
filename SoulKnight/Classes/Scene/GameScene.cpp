@@ -7,20 +7,35 @@
 #include"Enemy/Goblin.h"
 #include"Enemy/Pig.h"
 #include"MovingActor/Knight.h"
-#include"MovingActor/EnemyMelee.h"
 #include"Weapon/Pistol.h"
 #include"Weapon/Fork.h"
 #include"Scene/MenuScene.h"
 #include"Scene/Stage_2.h"
 #include"Weapon/Sword.h"
+#include"Weapon/Dart.h"
+#include"Scene/testmanSelectScene.h"
+#include"Scene/DieScene.h"
+#include"Scene/SafetyMapScene.h"
 
 USING_NS_CC;
 
-Scene* GameScene::createScene()
+Scene* GameScene::createScene(testmanSelect* scene)
 {
-	return GameScene::create();
+	return GameScene::create(scene);
 }
 
+
+GameScene* GameScene::create(testmanSelect* scene)
+{
+	GameScene* newScene = new GameScene();
+	if (newScene && newScene->init(scene))
+	{
+		newScene->autorelease();
+		return newScene;
+	}
+	CC_SAFE_DELETE(newScene);
+	return NULL;
+}
 static void problemLoading(const char* filename)
 {
 	printf("Error while loading: %s\n", filename);
@@ -28,7 +43,7 @@ static void problemLoading(const char* filename)
 
 }
 
-bool GameScene::init()
+bool GameScene::init(testmanSelect* scene)
 {
 	if (!Scene::init())
 	{
@@ -36,12 +51,18 @@ bool GameScene::init()
 
 	}
 	_gameBegin = true;
+	setPtestmanSelect(scene);
+	updateGrade();
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 
 	return true;
 }
 
+void GameScene::updateGrade()
+{
+	auto grade = getPtestmanSelect()->getGrade();//获得了上个scene的属性
+}
 // https://blog.csdn.net/oyangyufu/article/details/26468973
 void GameScene::setViewpointCenter(Vec2 position)
 {
@@ -55,7 +76,8 @@ void GameScene::setViewpointCenter(Vec2 position)
 
 	//地图移动偏移量
 	Vec2 offset = pointA - pointB;
-	offset.y += 300;	
+	offset.y += 350;
+	offset.x += 270;
 	this->setPosition(offset);
 }
 
@@ -110,51 +132,6 @@ void GameScene::menuMenuCallBack(cocos2d::Ref* pSender)
 
 
 	log("Touch Menu Menu Item %p", item);
-}
-void GameScene::menuPlayCallBack(cocos2d::Ref* pSender)
-{
-	//开始游戏
-	auto nextScene = GameScene::create();
-	Director::getInstance()->replaceScene(
-		TransitionSlideInT::create(1.0f / 60, nextScene));
-	MenuItem* item = static_cast<MenuItem*>(pSender);
-
-	log("Touch Transfer Item %p", item);
-}
-void GameScene::initNextScene()
-{
-	auto visibleSize = Director::getInstance()->getVisibleSize();//得到屏幕大小
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();//获得可视区域的出发点坐标，在处理相对位置时，确保节点在不同分辨率下的位置一致。
-
-	//加载对象层
-	CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
-	//加载玩家坐标对象
-	ValueMap  playerPointDic = objGroup->objectNamed("SpawnPoint");
-	float playerX = playerPointDic.at("x").asFloat();
-	float playerY = playerPointDic.at("y").asFloat();
-
-	//playMenu
-	MenuItemImage* playMenu = MenuItemImage::create(
-		"ArtDesigning/Word&Others/button/PLAY.png",
-		"ArtDesigning/Word&Others/button/PLAY.png",
-		CC_CALLBACK_1(GameScene::menuPlayCallBack, this)
-	);
-
-	if (playMenu == nullptr ||
-		playMenu->getContentSize().width <= 0 ||
-		playMenu->getContentSize().height <= 0)
-	{
-		problemLoading("'playMenu.png'");
-	}
-	else
-	{
-		playMenu->setPosition(Vec2(playerX, playerY));
-	}
-	//mu
-	Menu* mu = Menu::create(playMenu, NULL);
-	mu->setPosition(Vec2::ZERO);
-	this->addChild(mu, 1);
-
 }
 void GameScene::initCoin()
 {  
@@ -223,6 +200,11 @@ void GameScene::initFighter()
 	this->getMap()->addChild(weapon_2);
 	allWeapon.pushBack(weapon_2);
 
+	auto weapon_3 = Dart::create(EAttackMode::REMOTE, "Dart", DART_DAMAGE, DART_ATTACKSPEED,500, DART_MPCONSUME);
+	weapon_3->setPosition(Vec2(_myFighter->getPosition().x+50, _myFighter->getPosition().y));
+	this->getMap()->addChild(weapon_3);
+	allWeapon.pushBack(weapon_3);
+
 }
 void GameScene::initUI()
 {
@@ -241,6 +223,13 @@ void GameScene::initUI()
 	poisonSprite->setTag(683);
 	allUI.pushBack(poisonSprite);
 	this->addChild(poisonSprite);
+
+	auto slowSprite = Sprite::create("ArtDesigning/Word&Others/others/SpeedDown.png");
+	slowSprite->setPosition(70, 550);
+	slowSprite->setVisible(false);
+	slowSprite->setTag(695);
+	allUI.pushBack(slowSprite);
+	this->addChild(slowSprite);
 
 	auto pistolSprite = Sprite::create("ArtDesigning/FlyingItem/Weapon/Pistol.png");
 	pistolSprite->setPosition(70, 480);
@@ -262,6 +251,26 @@ void GameScene::initUI()
 	swordSprite->setTag(686);
 	allUI.pushBack(swordSprite);
 	this->addChild(swordSprite);
+
+	auto dartSprite = Sprite::create("ArtDesigning/FlyingItem/Weapon/Dart.png");
+	dartSprite->setPosition(70, 480);
+	dartSprite->setVisible(false);
+	dartSprite->setTag(687);
+	allUI.pushBack(dartSprite);
+	this->addChild(dartSprite);
+
+	auto skillSprite = Sprite::create("ArtDesigning/Word&Others/others/Skill.png");
+	skillSprite->setPosition(70, 430);
+	skillSprite->setVisible(false);
+	skillSprite->setTag(688);
+	allUI.pushBack(skillSprite);
+	this->addChild(skillSprite);
+
+	auto skillMessage = Label::create("","Marker Felt",30);
+	skillMessage->setPosition(70, 430);
+	skillMessage->setTag(689);
+	this->addChild(skillMessage,10);
+
 }
 void GameScene::initListener()
 {
@@ -351,7 +360,9 @@ void GameScene::generateComp()
 //加载动画（一个旋涡状）
 void GameScene::loadingAnimation()
 {
+	updateMusic();
 	//上方向动画
+
 	auto temp_1 = Animation::create();
 	for (int i = 1; i <= 2; i++)
 	{
@@ -438,7 +449,6 @@ void GameScene::loadingAnimation()
 
 
 	auto sprite = Sprite::create();
-
 	auto animation = CCAnimation::create();
 	for (int i = 1; i < 4; i++)
 	{
@@ -446,13 +456,10 @@ void GameScene::loadingAnimation()
 		sprintf(namesize, "ArtDesigning/Word&Others/others/xuanwo%d.png", i);
 		animation->addSpriteFrameWithFile(namesize);
 	}
-
 	animation->setDelayPerUnit(1.0f / 3.0f);   //1.0秒内3帧
 	animation->setRestoreOriginalFrame(true);
-
 	animation->setLoops(-1);
 	auto animate = CCAnimate::create(animation);
-
 	sprite->setScaleY(0.4);
 	if (roomState == SPAWNROOM_1)
 		sprite->setPosition(23 * 32, 57 * 32);
@@ -462,6 +469,56 @@ void GameScene::loadingAnimation()
 	sprite->runAction(CCRepeatForever::create(animate));
 
 
+
+	auto poison = Sprite::create();
+	auto poisonAnimation = CCAnimation::create();
+	for (int i = 1; i < 11; i++)
+	{
+		char namesizep[100] = { 0 };
+		sprintf(namesizep, "ArtDesigning/Word&Others/others/70%d.png", i);
+		poisonAnimation->addSpriteFrameWithFile(namesizep);
+	}
+	poisonAnimation->setDelayPerUnit(3.0f / 11.0f);
+	poisonAnimation->setRestoreOriginalFrame(true);
+	poisonAnimation->setLoops(-1);
+	auto posionAnimate = CCAnimate::create(poisonAnimation);
+	poison->setScale(0.7);
+	poison->setTag(10085);
+	poison->setPosition(48*32,25*32);
+	item.pushBack(poison);
+	getMap()->addChild(poison, 4);
+
+	
+	//正反毒气动画
+	auto tempAction_0 = CCRepeatForever::create(posionAnimate);
+	poison->runAction(tempAction_0);
+}
+
+void GameScene::updateItem()
+{
+	for (auto it=item.begin();it!=item.end();)
+	{
+		if (_myFighter->getPosition().getDistance((*it)->getPosition()) < 50)
+		{
+			if ((*it)->getTag() == 10085)
+				_myFighter->takeBuff(Buff::create(POISON, 0, 0, 0, 4));
+			if ((*it)->getTag() == 6618)
+			{
+				_myFighter->takeBuff(Buff::create(NORMAL, 0, 50, 0, 5000));
+				getMap()->removeChild(*it);
+				it = item.erase(it);
+				continue;
+			}
+			if ((*it)->getTag() == 6619)
+			{
+				_myFighter->takeBuff(Buff::create(NORMAL, 50, 0, 0, 5000));
+				getMap()->removeChild(*it);
+				it = item.erase(it);
+				continue;
+			}
+		}
+		it++;
+	}
 }
 
 //更新主角位置
@@ -498,6 +555,18 @@ void GameScene::updateFighterPosition()
 		if (collision == "true")
 			return;
 	}
+	if (roomState == ROOM_1_1)
+	{
+		tileGid = _spikeweed->tileGIDAt(tiledpos);
+		if (tileGid > 0)
+		{
+			if (_myFighter->getState() == NORMAL)
+				_myFighter->takeBuff(Buff::create(SPEEDDOWN, 0, 0, 0, 3));
+			if (_myFighter->getCanBeHurt())
+				_myFighter->hurt(5);
+
+		}
+	}
 
 	if (collisionForFightBool)
 	{
@@ -532,10 +601,13 @@ void GameScene::updateFighterPosition()
 			else if (roomState == SPAWNROOM_2)
 				roomState = ROOM_2_1;
 			else if (roomState == ROOM_2_2)
+			{
 				roomState = ROOM_2_3;
+				updateMusic();
+			}
 		}
 	}
-	if (roomState == SPAWNROOM_1 || roomState == ROOM_1_1)
+	if (roomState == SPAWNROOM_1 || roomState == ROOM_1_1||roomState==ROOM_2_3)
 	{
 		tileGid = _transfer->tileGIDAt(tiledpos);
 		if (tileGid > 0)
@@ -549,7 +621,10 @@ void GameScene::updateFighterPosition()
 			{
 				unscheduleUpdate();
 				_eventDispatcher->removeAllEventListeners();
-				scheduleOnce(schedule_selector(GameScene::toNextScene), 3.0f);
+				if(roomState==ROOM_1_1)
+					scheduleOnce(schedule_selector(GameScene::toNextScene), 3.0f);
+				else
+					endGame();
 			}
 		}
 	}
@@ -601,7 +676,12 @@ void GameScene::updateUI()
 			it->setVisible(true);
 			tempTag = it->getTag();
 		}
-		if ((it->getTag() == 682 || it->getTag() == 683)&&it->getTag()!=tempTag)
+		if (_myFighter->getState() == SPEEDDOWN && it->getTag() == 695)
+		{
+			it->setVisible(true);
+			tempTag = it->getTag();
+		}
+		if ((it->getTag() == 682 || it->getTag() == 683||it->getTag()==695)&&it->getTag()!=tempTag)
 			it->setVisible(false);
 	}
 
@@ -625,9 +705,47 @@ void GameScene::updateUI()
 			it->setVisible(true);
 			tempTag = it->getTag();
 		}
-		if (it->getTag() != 682 && it->getTag() != 683&&it->getTag()!=tempTag)
+		if (_myFighter->getCurrentWeapon()->getEquipName() == EEQUIPMENT::DART && it->getTag() == 687)
+		{
+			it->setVisible(true);
+			tempTag = it->getTag();
+		}
+		if (it->getTag() != 682 && it->getTag() != 683&&it->getTag()!=695&&it->getTag()!=tempTag)
 			it->setVisible(false);
 	}
+
+	auto label = dynamic_cast<Label*>(getChildByTag(689));
+	for (auto& it : allUI)
+	{
+		auto temp = dynamic_cast<Knight*>(_myFighter);
+		if (temp->getIsRelease())
+		{
+			if(it->getTag()==688)
+				it->setVisible(true);
+			label->setVisible(false);
+		}
+		else
+		{
+			if (it->getTag() == 688)
+				it->setVisible(false);
+			label->setVisible(true);
+		}
+		
+		
+		if (!temp->getIsRelease())
+		{
+			if (it->getTag() == 688)
+				it->setVisible(false);
+
+			auto nowTime = GetCurrentTime() / 1000.f;
+			if (!temp->getCanRelease())
+				label->setString(String::createWithFormat("%.2f", temp->getSkillCDTime() + temp->getLastReleaseTime() - nowTime)->getCString());
+			else
+				label->setString("OK");
+
+		}
+	}
+
 }
 
 void GameScene::updateEnemyPosition()
@@ -676,9 +794,41 @@ void GameScene::updateEnemyPosition()
 
 void GameScene::updateFlyingItem()
 {
+
+
+
 	for (auto current = flyingItem.begin(); current != flyingItem.end();)
 	{
 		(*current)->fly();
+		if ((*current)->getOwner()->getCamp() == ENEMY)
+		{
+			auto temp = dynamic_cast<Enemy*>((*current)->getOwner());
+			if (temp->getLevel() == BOSS)
+			{
+				current++;
+				continue;
+			}
+		}
+		CCPoint tiledpos = tileCoordForPosition((*current)->getPosition());
+		//碰撞检测
+		int tileGid = _collidable->tileGIDAt(tiledpos);
+		if (tileGid > 0)
+		{
+			Value prop = _map->getPropertiesForGID(tileGid);
+			ValueMap propValueMap = prop.asValueMap();
+
+			std::string collision = propValueMap["collidable"].asString();
+
+			//这一步的目的是为了在第二关时boss的子弹能穿过墙体对玩家进行干扰
+
+				if (collision == "true")
+				{
+					(*current)->setIsToClean(true);
+					current++;
+					continue;
+				}
+			
+		}
 		current++;
 	}
 
@@ -690,6 +840,7 @@ void GameScene::updateFlyingItem()
 			(*current)->setIsToClean(true);
 			continue;
 		}
+
 
 
 		if ((*current)->getOwner()->getCamp() == FRIENDLY)
@@ -726,7 +877,6 @@ void GameScene::updateFlyingItem()
 			{
 				if (_myFighter->getCanBeHurt())
 				{
-					_myFighter->setLastTimeInjured(GetCurrentTime() / 1000.f);
 					_myFighter->hurt((*current)->getDamage());
 					if((*current)->getcarryBuff()!=nullptr)
 						_myFighter->takeBuff((*current)->getcarryBuff());
@@ -787,7 +937,7 @@ void GameScene::updateSpecialBullet()
 					if (_myFighter->getPosition().getDistance((*current)->getPosition()) < 25 && _myFighter->getCanBeHurt())
 					{
 						_myFighter->hurt((*current)->getDamage());
-						_myFighter->setLastTimeInjured(GetCurrentTime()/1000.f);
+						
 					}
 				}
 
@@ -799,7 +949,6 @@ void GameScene::updateSpecialBullet()
 				if (_myFighter->getPosition().getDistance((*current)->getPosition()) < 25 && _myFighter->getCanBeHurt())
 				{
 					_myFighter->hurt((*current)->getDamage());
-					_myFighter->setLastTimeInjured(GetCurrentTime() / 1000.f);
 				}
 				if (nowTime - (*current)->getGiveOutTime() > 0.3f)
 					(*current)->setIsToClean(true);
@@ -832,7 +981,6 @@ void GameScene::clearObject()
 		else
 			++it;
 	}
-
 	for (auto it = specialBullet.begin(); it != specialBullet.end();)
 	{
 		if ((*it)->getIsToClean() || (*it)->getOwner()->getAlreadyDead())
@@ -889,6 +1037,19 @@ void GameScene::clearObject()
 
 }
 
+void GameScene::updateMusic()
+{
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	if (roomState == ROOM_2_3)
+	{
+		audio->playBackgroundMusic("ArtDesigning/Audio/Boss.mp3",true);
+	}
+	else
+	{
+		audio->playBackgroundMusic("ArtDesigning/Audio/Normal.mp3", true);
+	}
+}
+
 //帧更新??我看不出来在哪里调用了该函数，但是确实调用了
 void GameScene::update(float delta)
 {
@@ -896,6 +1057,7 @@ void GameScene::update(float delta)
 	updateFlyingItem();
 	updateComp();
 	updateUI();
+	updateItem();
 	updateSpecialBullet();
 	updateEnemyPosition();
 	updateNPC();
@@ -918,7 +1080,7 @@ bool GameScene::islegal(int X,int Y,Stage_State _stage)
 		return true;
 	}
 
-	if (_stage == ROOM_2_2)
+	if (_stage == ROOM_2_3)
 	{
 		if (!(X >= 40 * 32 && X <= 59 * 32 && Y >= 40 * 32 && Y <= 32 * 58))
 			return false;
@@ -1022,7 +1184,25 @@ bool GameScene::isKeyPressed(EventKeyboard::KeyCode keyCode)
 
 void GameScene::toNextScene(float delta)
 {
-	auto nextScene = Stage_2::create();
+	auto nextScene = Stage_2::create(_ptesmanSelect);
 	Director::getInstance()->replaceScene(
 		TransitionSlideInT::create(1.0f / 60, nextScene));
+}
+
+void GameScene::endGame()
+{
+	unscheduleUpdate();
+	_eventDispatcher->removeAllEventListeners();
+	if (_myFighter->getAlreadyDead())
+	{
+		auto nextScene = DieScene::create();
+		Director::getInstance()->replaceScene(
+			TransitionSlideInT::create(1.0f / 60, nextScene));
+	}
+	else
+	{
+		auto nextScene = SafetyMap::create();
+		Director::getInstance()->replaceScene(
+			TransitionSlideInT::create(1.0f / 60, nextScene));
+	}
 }

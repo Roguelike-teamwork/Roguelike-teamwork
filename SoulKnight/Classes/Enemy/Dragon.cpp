@@ -160,7 +160,7 @@ void Dragon::updateState()
 
 	if (isReleaseSkill_1)
 	{
-		if (fabs(nowTime - eachTime) > 0.005f)
+		if (fabs(nowTime - eachTime) > 0.01f)
 		{
 			chaosBullets();
 			eachTime = GetCurrentTime()/1000.f;

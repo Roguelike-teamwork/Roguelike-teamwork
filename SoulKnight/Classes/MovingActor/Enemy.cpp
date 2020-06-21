@@ -119,6 +119,34 @@ void Enemy::die()
 {
 	setVisible(false);
 	exploreScene->setCoinNum(exploreScene->getCoinNum()+5);
+
+
+	int temp_1;
+	int temp_2;
+	
+	temp_1 = random(3, 10);
+	if (temp_1 <= 5)
+	{
+		temp_2 = random(0, 1);
+		if (temp_2 == 0)
+		{
+			auto mp = Sprite::create("ArtDesigning/Word&Others/others/Mp.png");
+			mp->setPosition(getPosition());
+			mp->setTag(6618);
+			exploreScene->item.pushBack(mp);
+			exploreScene->getMap()->addChild(mp);
+		}
+		if (temp_2 == 1)
+		{
+			auto hp = Sprite::create("ArtDesigning/Word&Others/others/Hp.png");
+			hp->setPosition(getPosition());
+			hp->setTag(6619);
+			exploreScene->item.pushBack(hp);
+			exploreScene->getMap()->addChild(hp);
+		}
+	}
+
+
 	alreadyDead = true;
 }
 void Enemy::updateAction()

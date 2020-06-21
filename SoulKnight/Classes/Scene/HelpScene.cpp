@@ -42,30 +42,26 @@ bool Help::init()
 	else
 	{
 		float x = visibleSize.width / 4;
-		float y = visibleSize.height - 550;
+		float y = visibleSize.height - 600;
 		exitMenu->setPosition(Vec2(x, y));
 	}
 
 
-	auto offMusic = MenuItemImage::create("ArtDesigning/SceneAndMap/StartGame/on.png", "on.png");
-	auto onMusic = MenuItemImage::create("ArtDesigning/SceneAndMap/StartGame/off.png", "off.png");
-	offMusic->setScale(0.5);
-	onMusic->setScale(0.5);
-	MenuItemToggle* audioMenu = MenuItemToggle::createWithCallback(
-		CC_CALLBACK_1(Help::menuAudioCallBack, this),
-		offMusic, onMusic, NULL
-	);
-	audioMenu->setPosition(Vec2(visibleSize.width / 6 * 5 + 40, visibleSize.height - 180));
-
-
-	Menu* mu = Menu::create(exitMenu,audioMenu, NULL);
+	Menu* mu = Menu::create(exitMenu,NULL);
 	mu->setPosition(Vec2::ZERO);
-	this->addChild(mu, 1);
+	this->addChild(mu, 11);
 
+
+	Sprite* bg = Sprite::create("ArtDesigning/Word&Others/others/board.png");
+	bg->setAnchorPoint(Vec2(0.5, 0.5));
+	bg->setScale(0.6);
+	float x = visibleSize.width / 2+120;
+	float y = visibleSize.height/ 2+60;
+	bg->setPosition(Vec2(x, y));
+	this->addChild(bg,2);
 	//background
-	auto background = CCTMXTiledMap::create("ArtDesigning/SceneAndMap/StartGame/Helpbg.tmx");
+	auto background = Sprite::create("ArtDesigning/SceneAndMap/StartGame/helpbg.png");
 	if (background == nullptr)
-
 	{
 		problemLoading("'helpbg.png'");
 	}
@@ -89,13 +85,4 @@ void Help::menuExitCallBack(cocos2d::Ref* pSender)
 
 	log("Touch Exit Menu Item %p", item);
 }
-void Help::menuAudioCallBack(cocos2d::Ref* pSender)
-{
-	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	if (audio->isBackgroundMusicPlaying()) {
-		audio->pauseBackgroundMusic();
-	}
-	else {
-		audio->resumeBackgroundMusic();
-	}
-}
+

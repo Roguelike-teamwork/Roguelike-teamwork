@@ -49,7 +49,6 @@ void MovingActor::takeDamage(DamageMode type, INT32 damage, MovingActor* enemy)
 
 	curHitPoints -= damage;
 	attackFrom = enemy;
-	CCLOG("BOSS HP=%d", curHitPoints);
 	if (curHitPoints<= 0)
 		die();
 }

@@ -8,48 +8,46 @@
 #include"Enemy/Goblin.h"
 #include"Enemy/Pig.h"
 #include"MovingActor/Knight.h"
-#include"MovingActor/EnemyMelee.h"
 #include"Weapon/Pistol.h"
 #include"Weapon/Fork.h"
 #include"Enemy/Rabbit.h"
 #include"Enemy/Crow.h"
 #include"Scene/MenuScene.h"
 
-Scene* Stage_1::createScene()
+Scene* Stage_1::createScene(testmanSelect* scene)
 {
-	return Stage_1::create();
+	return Stage_1::create(scene);
 }
 
-Stage_1* Stage_1::create()
+Stage_1* Stage_1::create(testmanSelect* scene)
 {
-	auto scene = new Stage_1;
-	if (scene && scene->init())
+	auto _scene = new Stage_1;
+	if (_scene && _scene->init(scene))
 	{
-		scene->autorelease();
-		return scene;
+		_scene->autorelease();
+		return _scene;
 	}
-	CC_SAFE_DELETE(scene);
+	CC_SAFE_DELETE(_scene);
 	return NULL;
 }
 
 
-bool Stage_1::init()
+bool Stage_1::init(testmanSelect* scene)
 {
 	if (!Scene::init())
 	{
 		return false;
 	}
 	_gameBegin = true;
+	setPtestmanSelect(scene);
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 	roomState = SPAWNROOM_1;
 	initMapLayer();
-
 	initFighter();
 	loadingAnimation();
 	initComp();
 	initListener();
-	initNextScene();
 	initSettingMenu();
 	initCoin();
 	initUI();
@@ -81,6 +79,7 @@ void Stage_1::initMapLayer()
 	_fence->setVisible(false);
 	_transfer = _map->getLayer("transfer");
 	_transfer->setVisible(false);
+	_spikeweed = _map->getLayer("spikeweed");
 	addChild(_map, 0, 10000);//TAG_MAP
 }
 

@@ -8,36 +8,36 @@
 #include"Enemy/Goblin.h"
 #include"Enemy/Pig.h"
 #include"MovingActor/Knight.h"
-#include"MovingActor/EnemyMelee.h"
 #include"Weapon/Pistol.h"
 #include"Weapon/Fork.h"
 #include"Scene/MenuScene.h"
 
-Scene* Stage_2::createScene()
+Scene* Stage_2::createScene(testmanSelect* scene)
 {
-	return Stage_2::create();
+	return Stage_2::create(scene);
 }
 
-Stage_2* Stage_2::create()
+Stage_2* Stage_2::create(testmanSelect* scene)
 {
-	auto scene = new Stage_2;
-	if (scene && scene->init())
+	auto _scene = new Stage_2;
+	if (_scene && _scene->init(scene))
 	{
-		scene->autorelease();
-		return scene;
+		_scene->autorelease();
+		return _scene;
 	}
-	CC_SAFE_DELETE(scene);
+	CC_SAFE_DELETE(_scene);
 	return NULL;
 }
 
 
-bool Stage_2::init()
+bool Stage_2::init(testmanSelect* scene)
 {
 	if (!Scene::init())
 	{
 		return false;
 	}
 	_gameBegin = true;
+	setPtestmanSelect(scene);
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 	roomState = SPAWNROOM_2;
@@ -47,7 +47,7 @@ bool Stage_2::init()
 	loadingAnimation();
 	initComp();
 	initListener();
-	initNextScene();
+
 	initSettingMenu();
 	initCoin();
 	initUI();
@@ -74,6 +74,8 @@ void Stage_2::initMapLayer()
 	_fenceBool = _map->getLayer("fenceBool");
 	_fenceBool->setVisible(false);
 	_collisionForFight = _map->getLayer("collisionForFight");
+	_transfer = _map->getLayer("transfer");
+	_transfer->setVisible(false);
 	addChild(_map, 0, 10000);//TAG_MAP
 }
 
@@ -261,7 +263,7 @@ void Stage_2::generateNpc()
 			float npcY = playerPointDic.at("y").asFloat();
 
 			npc->setPosition(ccp(npcX, npcY));
-			npc->setScale(0.75);
+			npc->setScale(0.6);
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);
 		}
@@ -275,7 +277,7 @@ void Stage_2::generateNpc()
 			float npcY = playerPointDic.at("y").asFloat();
 
 			npc->setPosition(ccp(npcX, npcY));
-			npc->setScale(0.75);
+			npc->setScale(0.6);
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);
 		}
@@ -288,19 +290,19 @@ void Stage_2::generateNpc()
 			float npcX = playerPointDic.at("x").asFloat();
 			float npcY = playerPointDic.at("y").asFloat();
 			npc->setPosition(ccp(npcX, npcY));
-			npc->setScale(1.25);
+			npc->setScale(0.6);
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);
 		}
 		else if (temp == 3)
 		{
-			auto npc = UnMovingActor::create("EnergyBox", this, ManaBox, 75);
+			auto npc = UnMovingActor::create("ManaBox", this, ManaBox, 75);
 			CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
 			//加载玩家坐标对象
 			ValueMap  playerPointDic = objGroup->objectNamed("NPCPoint1");
 			float npcX = playerPointDic.at("x").asFloat();
 			float npcY = playerPointDic.at("y").asFloat();
-			npc->setScale(0.75);
+			npc->setScale(0.6);
 			npc->setPosition(ccp(npcX, npcY));
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);
@@ -329,7 +331,7 @@ void Stage_2::generateNpc()
 			float npcY = playerPointDic.at("y").asFloat();
 
 			npc->setPosition(ccp(npcX, npcY));
-			npc->setScale(0.75);
+			npc->setScale(0.6);
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);
 		}
@@ -343,7 +345,7 @@ void Stage_2::generateNpc()
 			float npcY = playerPointDic.at("y").asFloat();
 
 			npc->setPosition(ccp(npcX, npcY));
-			npc->setScale(0.75);
+			npc->setScale(0.6);
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);
 		}
@@ -356,19 +358,19 @@ void Stage_2::generateNpc()
 			float npcX = playerPointDic.at("x").asFloat();
 			float npcY = playerPointDic.at("y").asFloat();
 			npc->setPosition(ccp(npcX, npcY));
-			npc->setScale(1.25);
+			npc->setScale(0.6);
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);
 		}
 		else if (temp == 3)
 		{
-			auto npc = UnMovingActor::create("EnergyBox", this, ManaBox, 75);
+			auto npc = UnMovingActor::create("ManaBox", this, ManaBox, 75);
 			CCTMXObjectGroup* objGroup = _map->objectGroupNamed("objects");
 			//加载玩家坐标对象
 			ValueMap  playerPointDic = objGroup->objectNamed("NPCPoint2");
 			float npcX = playerPointDic.at("x").asFloat();
 			float npcY = playerPointDic.at("y").asFloat();
-			npc->setScale(0.75);
+			npc->setScale(0.6);
 			npc->setPosition(ccp(npcX, npcY));
 			getMap()->addChild(npc);
 			allNpc.pushBack(npc);

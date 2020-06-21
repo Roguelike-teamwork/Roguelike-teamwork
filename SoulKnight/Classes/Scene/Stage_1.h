@@ -8,14 +8,16 @@
 
 USING_NS_CC;
 
+class testmanSelect;
+
 class Stage_1 :public GameScene
 {
 public:
-	static Scene* createScene();
+	static Scene* createScene(testmanSelect* scene);
 
-	static Stage_1* create();
+	static Stage_1* create(testmanSelect* scene);
 
-	virtual bool init();
+	virtual bool init(testmanSelect* scene);
 
 	virtual void generateEnemies();
 

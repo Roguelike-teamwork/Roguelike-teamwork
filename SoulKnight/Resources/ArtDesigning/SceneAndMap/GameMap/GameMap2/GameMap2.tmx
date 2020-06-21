@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="90" height="78" tilewidth="32" tileheight="32" infinite="0" nextlayerid="21" nextobjectid="12">
+<map version="1.2" tiledversion="1.3.5" orientation="orthogonal" renderorder="right-down" width="90" height="78" tilewidth="32" tileheight="32" infinite="0" nextlayerid="23" nextobjectid="12">
  <tileset firstgid="1" name="source1" tilewidth="32" tileheight="32" tilecount="256" columns="16">
   <image source="source1.png" width="512" height="512"/>
   <tile id="118">
@@ -1980,4 +1980,9 @@
   <object id="9" name="LeftPoint" x="2260" y="832" width="80" height="44"/>
   <object id="11" name="NPCPoint2" x="548" y="929" width="77" height="32"/>
  </objectgroup>
+ <layer id="22" name="transfer" width="90" height="78">
+  <data encoding="base64" compression="zlib">
+   eJzt0DENAAAIwDAI/j1zoIFw0CYzsAgAAAAAAAAAAOCrrIldPgMAAAAAAAAAAAAAAAAAAAAAwJ0G+YAAEQ==
+  </data>
+ </layer>
 </map>

@@ -155,6 +155,7 @@ bool Fighter::isInMelee()           //判断enemy位于范围内，暂时不会�
 
 void Fighter::hurt(INT32 damage)
 {
+	lastTimeInjured = GetCurrentTime() / 1000.f;
 	int currentDamage = damage;
 	if (!isZeroSheild())
 	{
@@ -232,7 +233,14 @@ void Fighter::updateCondition()
 			}
 		}
 	}
-
+	else if (state == SPEEDDOWN)
+	{
+		moveSpeed = 3;
+	}
+	else if (state == NORMAL)
+	{
+		moveSpeed = tempMove;
+	}
 
 	if (!canBeHurt)
 	{
@@ -443,6 +451,7 @@ void Fighter::die()
 	
 	setVisible(false);
 	alreadyDead = true;
+	exploreScene->endGame();
 	//进入结算页面
 }
 
@@ -461,9 +470,8 @@ void Fighter::takeBuff(Buff* buff)
 {
 	this->curHitPoints += buff->getBuffHp();
 	this->curManaPoints += buff->getBuffMp();
-	this->moveSpeed += buff->getBuffMoveSpeed();
 
-	if ((buff->getBuffType() == BURN || buff->getBuffType() == POISON)&&state==NORMAL)
+	if ((buff->getBuffType() == BURN || buff->getBuffType() == POISON||buff->getBuffType()==SPEEDDOWN)&&state==NORMAL)
 	{
 		state = buff->getBuffType();
 		buff->setTag(10795);
@@ -478,6 +486,9 @@ void Fighter::removeBuff()
 {
 	auto nowTime = GetCurrentTime()/1000.f;
 
+
+
+
 	for (auto it = myBuff.begin(); it != myBuff.end();)
 	{
 		if (nowTime - (*it)->getBeginTime() > (*it)->getDuration())
@@ -485,10 +496,11 @@ void Fighter::removeBuff()
 			
 				this->curHitPoints -= (*it)->getBuffHp();
 				this->curManaPoints -= (*it)->getBuffMp();
-				this->moveSpeed -= (*it)->getBuffMoveSpeed();
 
-				if ((*it)->getTag()==10795)
+				if ((*it)->getTag() == 10795)
+				{
 					state = NORMAL;
+				}
 				it = myBuff.erase(it);
 		}
 		else
